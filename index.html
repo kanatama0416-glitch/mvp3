@@ -99,18 +99,17 @@
     </div>
 
     <script>
-        // --- 設定 ---
-        const SUPABASE_URL = 'https://xxtqtvacrrshbslsnnvx.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
-        
-        // 【重要】ここで一度だけ宣言する！
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 名前が重複しないよう、念のためチェックして作成
+        if (typeof clientSupabase === 'undefined') {
+            const S_URL = 'https://xxtqtvacrrshbslsnnvx.supabase.co';
+            const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
+            var clientSupabase = Supabase.createClient(S_URL, S_KEY);
+        }
 
-        const form = document.getElementById('promoForm');
+        const promoForm = document.getElementById('promoForm');
         const submitBtn = document.getElementById('submitBtn');
-        const successMessage = document.getElementById('successMessage');
+        const successMsg = document.getElementById('successMessage');
 
-        // ファイル選択プレビュー
         ['hook_image', 'pitch_image'].forEach(id => {
             document.getElementById(id).addEventListener('change', e => {
                 const preview = document.getElementById(`${id}_preview`);
@@ -119,20 +118,19 @@
         });
 
         function resetForm() {
-            form.reset();
-            successMessage.classList.add('hidden');
+            promoForm.reset();
+            successMsg.classList.add('hidden');
             document.getElementById('hook_preview').classList.add('hidden');
             document.getElementById('pitch_preview').classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        form.addEventListener('submit', async (e) => {
+        promoForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 送信中...';
 
             try {
-                // 画像アップロード関数
                 const uploadImg = async (fileInputId) => {
                     const file = document.getElementById(fileInputId).files[0];
                     if (!file) return null;
@@ -140,19 +138,18 @@
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
                     const filePath = `uploads/${fileName}`;
                     
-                    const { error: uploadError } = await supabase.storage
+                    const { error: uploadError } = await clientSupabase.storage
                         .from('event-photos')
                         .upload(filePath, file);
 
-                    if (uploadError) throw new Error('画像アップロード失敗: ' + uploadError.message);
+                    if (uploadError) throw new Error('画像保存失敗: ' + uploadError.message);
                     return filePath;
                 };
 
-                const hookImgPath = await uploadImg('hook_image');
-                const pitchImgPath = await uploadImg('pitch_image');
+                const hPath = await uploadImg('hook_image');
+                const pPath = await uploadImg('pitch_image');
 
-                // データ挿入
-                const { error } = await supabase
+                const { error } = await clientSupabase
                     .from('event_promotions')
                     .insert([{
                         staff_name: document.getElementById('staff_name').value,
@@ -162,18 +159,17 @@
                         has_signup_bonus: document.querySelector('input[name="has_signup_bonus"]:checked').value === 'true',
                         hook_content: document.getElementById('hook_content').value,
                         pitch_content: document.getElementById('pitch_content').value,
-                        hook_image_url: hookImgPath,
-                        pitch_image_url: pitchImgPath,
+                        hook_image_url: hPath,
+                        pitch_image_url: pPath,
                         memo: document.getElementById('memo').value
                     }]);
 
                 if (error) throw error;
-
-                successMessage.classList.remove('hidden');
+                successMsg.classList.remove('hidden');
 
             } catch (err) {
-                console.error("エラー詳細:", err);
-                alert('【送信失敗】\n理由: ' + err.message + '\n\n※テーブルのカラム名や、Storageバケット名が正しいか確認してください。');
+                console.error("詳細:", err);
+                alert('送信できませんでした。\n理由: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '登録する';
