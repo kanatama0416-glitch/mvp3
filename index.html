@@ -27,7 +27,7 @@
                 </div>
                 <h2 class="text-xl font-bold text-gray-800 mb-2">送信完了！</h2>
                 <p class="text-sm text-gray-500 mb-6">施策内容を無事に保存しました。</p>
-                <button onclick="resetForm()" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md">続けて投稿する</button>
+                <button type="button" id="resetBtn" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md">続けて投稿する</button>
             </div>
         </div>
 
@@ -72,7 +72,7 @@
                         <i class="fa-solid fa-camera"></i> 写真を追加
                         <input type="file" id="hook_image" accept="image/*" class="hidden">
                     </label>
-                    <div id="hook_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold">画像セット完了</div>
+                    <div id="hook_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold italic">画像セット完了</div>
                 </div>
             </div>
 
@@ -86,7 +86,7 @@
                         <i class="fa-solid fa-image"></i> 写真を追加
                         <input type="file" id="pitch_image" accept="image/*" class="hidden">
                     </label>
-                    <div id="pitch_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold">画像セット完了</div>
+                    <div id="pitch_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold italic">画像セット完了</div>
                 </div>
             </div>
 
@@ -94,64 +94,64 @@
                 <textarea id="memo" rows="2" placeholder="ほかになにかあれば" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm"></textarea>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">登録する</button>
+            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+                登録する
+            </button>
         </form>
     </div>
 
     <script>
-        // 名前が重複しないよう、念のためチェックして作成
-        if (typeof clientSupabase === 'undefined') {
+        // 即時関数(IIFE)で囲むことで、変数名の重複エラー（supabase already declared）を100%回避します
+        (function() {
             const S_URL = 'https://xxtqtvacrrshbslsnnvx.supabase.co';
             const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
-            var clientSupabase = Supabase.createClient(S_URL, S_KEY);
-        }
+            
+            // 変数名を dbClient に変更し、競合を完全に防ぎます
+            const dbClient = Supabase.createClient(S_URL, S_KEY);
 
-        const promoForm = document.getElementById('promoForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const successMsg = document.getElementById('successMessage');
+            const form = document.getElementById('promoForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const successOverlay = document.getElementById('successMessage');
 
-        ['hook_image', 'pitch_image'].forEach(id => {
-            document.getElementById(id).addEventListener('change', e => {
-                const preview = document.getElementById(`${id}_preview`);
-                if (e.target.files.length > 0) preview.classList.remove('hidden');
+            // プレビュー表示
+            ['hook_image', 'pitch_image'].forEach(id => {
+                document.getElementById(id).addEventListener('change', e => {
+                    const preview = document.getElementById(`${id}_preview`);
+                    if (e.target.files.length > 0) preview.classList.remove('hidden');
+                });
             });
-        });
 
-        function resetForm() {
-            promoForm.reset();
-            successMsg.classList.add('hidden');
-            document.getElementById('hook_preview').classList.add('hidden');
-            document.getElementById('pitch_preview').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            // リセット処理
+            document.getElementById('resetBtn').onclick = () => {
+                form.reset();
+                successOverlay.classList.add('hidden');
+                document.getElementById('hook_preview').classList.add('hidden');
+                document.getElementById('pitch_preview').classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
 
-        promoForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 送信中...';
+            // 送信処理
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 送信中...';
 
-            try {
-                const uploadImg = async (fileInputId) => {
-                    const file = document.getElementById(fileInputId).files[0];
-                    if (!file) return null;
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-                    const filePath = `uploads/${fileName}`;
-                    
-                    const { error: uploadError } = await clientSupabase.storage
-                        .from('event-photos')
-                        .upload(filePath, file);
+                try {
+                    const uploadImg = async (inputId) => {
+                        const file = document.getElementById(inputId).files[0];
+                        if (!file) return null;
+                        const ext = file.name.split('.').pop();
+                        const path = `uploads/${Date.now()}_${Math.random().toString(36).slice(-5)}.${ext}`;
+                        
+                        const { error: upErr } = await dbClient.storage.from('event-photos').upload(path, file);
+                        if (upErr) throw new Error('画像保存失敗: ' + upErr.message);
+                        return path;
+                    };
 
-                    if (uploadError) throw new Error('画像保存失敗: ' + uploadError.message);
-                    return filePath;
-                };
+                    const hImg = await uploadImg('hook_image');
+                    const pImg = await uploadImg('pitch_image');
 
-                const hPath = await uploadImg('hook_image');
-                const pPath = await uploadImg('pitch_image');
-
-                const { error } = await clientSupabase
-                    .from('event_promotions')
-                    .insert([{
+                    const { error: dbErr } = await dbClient.from('event_promotions').insert([{
                         staff_name: document.getElementById('staff_name').value,
                         event_name: document.getElementById('event_name').value,
                         store_name: document.getElementById('store_name').value,
@@ -159,22 +159,23 @@
                         has_signup_bonus: document.querySelector('input[name="has_signup_bonus"]:checked').value === 'true',
                         hook_content: document.getElementById('hook_content').value,
                         pitch_content: document.getElementById('pitch_content').value,
-                        hook_image_url: hPath,
-                        pitch_image_url: pPath,
+                        hook_image_url: hImg,
+                        pitch_image_url: pImg,
                         memo: document.getElementById('memo').value
                     }]);
 
-                if (error) throw error;
-                successMsg.classList.remove('hidden');
+                    if (dbErr) throw dbErr;
+                    successOverlay.classList.remove('hidden');
 
-            } catch (err) {
-                console.error("詳細:", err);
-                alert('送信できませんでした。\n理由: ' + err.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '登録する';
-            }
-        });
+                } catch (err) {
+                    console.error("Error Detail:", err);
+                    alert('送信エラーが発生しました。\n\n理由: ' + err.message + '\n\n※RLS設定やカラム名を確認してください。');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '登録する';
+                }
+            };
+        })();
     </script>
 </body>
 </html>
