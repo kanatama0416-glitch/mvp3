@@ -8,11 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #f8f9ff; color: #333; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8f9ff; color: #333; font-family: sans-serif; }
         .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .accent-purple { background-color: #f3f0ff; border: 1px solid #e9e4ff; }
         input[type="radio"]:checked + span { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
-        .loading { opacity: 0.5; pointer-events: none; }
         @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .success-overlay { animation: popIn 0.3s ease-out; }
     </style>
@@ -26,132 +25,97 @@
                     <i class="fa-solid fa-check"></i>
                 </div>
                 <h2 class="text-xl font-bold text-gray-800 mb-2">送信完了！</h2>
-                <p class="text-sm text-gray-500 mb-6">施策内容を無事に保存しました。</p>
-                <button type="button" id="resetBtn" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md">続けて投稿する</button>
+                <button type="button" onclick="location.reload()" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold">続けて投稿する</button>
             </div>
         </div>
 
         <div class="mb-6 flex items-center gap-2 text-lg font-bold text-gray-700">
-            <span class="text-pink-500">📌</span>
-            <h1>施策内容の登録</h1>
+            <span>📌</span> <h1>施策内容の登録</h1>
         </div>
 
         <form id="promoForm" class="space-y-4">
             <div class="bg-white p-5 rounded-2xl card-shadow border border-gray-100 space-y-3">
-                <div class="flex items-center gap-2 mb-1 font-bold text-gray-800 text-sm">
-                    <i class="fa-solid fa-user-pen text-blue-400"></i> 基本情報
-                </div>
-                <input type="text" id="staff_name" placeholder="お名前" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required>
-                <input type="text" id="event_name" placeholder="イベント名" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm" required>
-                <input type="text" id="store_name" placeholder="店舗名・会場" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm">
+                <input type="text" id="staff_name" placeholder="お名前" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl" required>
+                <input type="text" id="event_name" placeholder="イベント名" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl" required>
+                <input type="text" id="store_name" placeholder="店舗名・会場" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl">
             </div>
 
             <div class="accent-purple p-5 rounded-3xl card-shadow space-y-4">
-                <div class="flex items-center gap-2 font-bold text-gray-800 text-sm"><span>🎁</span> 特典・券面設定</div>
-                <div class="space-y-3">
-                    <p class="text-xs font-bold text-gray-600 px-1">コンテンツ関連の券面はある？</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="cursor-pointer"><input type="radio" name="has_special_design" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">あり</span></label>
-                        <label class="cursor-pointer"><input type="radio" name="has_special_design" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">なし</span></label>
-                    </div>
-                    <p class="text-xs font-bold text-gray-600 px-1 mt-3">カード入会特典はある？</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">あり</span></label>
-                        <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">なし</span></label>
-                    </div>
+                <p class="text-xs font-bold text-gray-600 px-1">コンテンツ関連の券面はある？</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="cursor-pointer"><input type="radio" name="has_special_design" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm">あり</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_special_design" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm">なし</span></label>
+                </div>
+                <p class="text-xs font-bold text-gray-600 px-1 mt-3">カード入会特典はある？</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm">あり</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm">なし</span></label>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-                <div class="p-4">
-                    <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-comment-dots text-orange-400"></i> フック内容</label>
-                    <textarea id="hook_content" rows="3" placeholder="最初の声掛け" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 border-t border-dashed border-gray-200">
-                    <label class="flex items-center justify-center gap-2 cursor-pointer py-2 px-4 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-600">
-                        <i class="fa-solid fa-camera"></i> 写真を追加
-                        <input type="file" id="hook_image" accept="image/*" class="hidden">
-                    </label>
-                    <div id="hook_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold italic">画像セット完了</div>
-                </div>
+            <div class="bg-white rounded-2xl card-shadow border border-gray-100 p-4">
+                <label class="block text-sm font-bold mb-2">フック内容</label>
+                <textarea id="hook_content" rows="3" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
+                <input type="file" id="hook_image" accept="image/*" class="mt-2 text-xs">
             </div>
 
-            <div class="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-                <div class="p-4">
-                    <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-bullhorn text-green-400"></i> ひきこみ内容</label>
-                    <textarea id="pitch_content" rows="3" placeholder="メリットの伝え方" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 border-t border-dashed border-gray-200">
-                    <label class="flex items-center justify-center gap-2 cursor-pointer py-2 px-4 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-600">
-                        <i class="fa-solid fa-image"></i> 写真を追加
-                        <input type="file" id="pitch_image" accept="image/*" class="hidden">
-                    </label>
-                    <div id="pitch_preview" class="hidden mt-2 text-[10px] text-blue-500 text-center font-bold italic">画像セット完了</div>
-                </div>
+            <div class="bg-white rounded-2xl card-shadow border border-gray-100 p-4">
+                <label class="block text-sm font-bold mb-2">ひきこみ内容</label>
+                <textarea id="pitch_content" rows="3" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
+                <input type="file" id="pitch_image" accept="image/*" class="mt-2 text-xs">
             </div>
 
             <div class="bg-white p-5 rounded-2xl card-shadow border border-gray-100">
                 <textarea id="memo" rows="2" placeholder="ほかになにかあれば" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm"></textarea>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
-                登録する
-            </button>
+            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg">登録する</button>
         </form>
     </div>
 
     <script>
-        // 即時関数(IIFE)で囲むことで、変数名の重複エラー（supabase already declared）を100%回避します
-        (function() {
+        // 2. 読み込み完了を待ってから実行する
+        window.onload = function() {
+            if (typeof supabase === 'undefined') {
+                // 万が一SDKが読み込めていなかった場合の最終手段
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+                script.onload = initApp;
+                document.head.appendChild(script);
+            } else {
+                initApp();
+            }
+        };
+
+        function initApp() {
             const S_URL = 'https://xxtqtvacrrshbslsnnvx.supabase.co';
             const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
             
-            // 変数名を dbClient に変更し、競合を完全に防ぎます
-            const dbClient = Supabase.createClient(S_URL, S_KEY);
+            // supabaseライブラリが使えることを確認してからクライアント作成
+            const client = supabase.createClient(S_URL, S_KEY);
 
             const form = document.getElementById('promoForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const successOverlay = document.getElementById('successMessage');
+            const btn = document.getElementById('submitBtn');
 
-            // プレビュー表示
-            ['hook_image', 'pitch_image'].forEach(id => {
-                document.getElementById(id).addEventListener('change', e => {
-                    const preview = document.getElementById(`${id}_preview`);
-                    if (e.target.files.length > 0) preview.classList.remove('hidden');
-                });
-            });
-
-            // リセット処理
-            document.getElementById('resetBtn').onclick = () => {
-                form.reset();
-                successOverlay.classList.add('hidden');
-                document.getElementById('hook_preview').classList.add('hidden');
-                document.getElementById('pitch_preview').classList.add('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
-            // 送信処理
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 送信中...';
+                btn.disabled = true;
+                btn.innerText = '送信中...';
 
                 try {
-                    const uploadImg = async (inputId) => {
-                        const file = document.getElementById(inputId).files[0];
+                    const uploadImg = async (id) => {
+                        const file = document.getElementById(id).files[0];
                         if (!file) return null;
-                        const ext = file.name.split('.').pop();
-                        const path = `uploads/${Date.now()}_${Math.random().toString(36).slice(-5)}.${ext}`;
-                        
-                        const { error: upErr } = await dbClient.storage.from('event-photos').upload(path, file);
-                        if (upErr) throw new Error('画像保存失敗: ' + upErr.message);
+                        const path = `uploads/${Date.now()}_${file.name}`;
+                        const { error } = await client.storage.from('event-photos').upload(path, file);
+                        if (error) throw error;
                         return path;
                     };
 
-                    const hImg = await uploadImg('hook_image');
-                    const pImg = await uploadImg('pitch_image');
+                    const hPath = await uploadImg('hook_image');
+                    const pPath = await uploadImg('pitch_image');
 
-                    const { error: dbErr } = await dbClient.from('event_promotions').insert([{
+                    const { error } = await client.from('event_promotions').insert([{
                         staff_name: document.getElementById('staff_name').value,
                         event_name: document.getElementById('event_name').value,
                         store_name: document.getElementById('store_name').value,
@@ -159,23 +123,22 @@
                         has_signup_bonus: document.querySelector('input[name="has_signup_bonus"]:checked').value === 'true',
                         hook_content: document.getElementById('hook_content').value,
                         pitch_content: document.getElementById('pitch_content').value,
-                        hook_image_url: hImg,
-                        pitch_image_url: pImg,
+                        hook_image_url: hPath,
+                        pitch_image_url: pPath,
                         memo: document.getElementById('memo').value
                     }]);
 
-                    if (dbErr) throw dbErr;
-                    successOverlay.classList.remove('hidden');
+                    if (error) throw error;
+                    document.getElementById('successMessage').classList.remove('hidden');
 
                 } catch (err) {
-                    console.error("Error Detail:", err);
-                    alert('送信エラーが発生しました。\n\n理由: ' + err.message + '\n\n※RLS設定やカラム名を確認してください。');
+                    alert('送信エラー: ' + err.message);
                 } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '登録する';
+                    btn.disabled = false;
+                    btn.innerText = '登録する';
                 }
             };
-        })();
+        }
     </script>
 </body>
 </html>
