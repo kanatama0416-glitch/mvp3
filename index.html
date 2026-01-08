@@ -13,7 +13,11 @@
         .accent-purple { background-color: #f3f0ff; border: 1px solid #e9e4ff; }
         input[type="radio"]:checked + span { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
         .border-dashed-top { border-top: 1px dashed #e2e8f0; }
-        .preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; display: none; margin-bottom: 12px; }
+        
+        /* プレビュー画像のスタイル */
+        .preview-container { display: none; width: 100%; margin-bottom: 12px; position: relative; }
+        .preview-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .remove-btn { position: absolute; top: 8px; right: 8px; bg-black/50; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; items-center; justify-center; font-size: 12px; backdrop-blur: sm; }
     </style>
 </head>
 <body class="p-4 pb-12 text-gray-700">
@@ -56,10 +60,12 @@
                     <div class="flex items-center gap-2 text-sm font-bold">
                         <span class="text-orange-400">💬</span> フック内容
                     </div>
-                    <textarea id="hook_content" rows="3" placeholder="最初の声掛けなど" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-purple-300"></textarea>
+                    <textarea id="hook_content" rows="3" placeholder="最初の声掛けなど" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none"></textarea>
                 </div>
                 <div class="bg-gray-50 p-4 border-dashed-top">
-                    <img id="hook_preview" class="preview-img shadow-sm" src="#" alt="preview">
+                    <div id="hook_preview_container" class="preview-container">
+                        <img id="hook_preview_img" src="" class="preview-img">
+                    </div>
                     
                     <label class="flex items-center justify-center gap-2 w-full py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
                         <i class="fa-solid fa-camera text-gray-400"></i>
@@ -74,10 +80,12 @@
                     <div class="flex items-center gap-2 text-sm font-bold">
                         <span class="text-green-400">📢</span> ひきこみ内容
                     </div>
-                    <textarea id="pitch_content" rows="3" placeholder="メリットの伝え方など" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-purple-300"></textarea>
+                    <textarea id="pitch_content" rows="3" placeholder="メリットの伝え方など" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none"></textarea>
                 </div>
                 <div class="bg-gray-50 p-4 border-dashed-top">
-                    <img id="pitch_preview" class="preview-img shadow-sm" src="#" alt="preview">
+                    <div id="pitch_preview_container" class="preview-container">
+                        <img id="pitch_preview_img" src="" class="preview-img">
+                    </div>
 
                     <label class="flex items-center justify-center gap-2 w-full py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
                         <i class="fa-solid fa-image text-gray-400"></i>
@@ -88,7 +96,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-2xl card-shadow border border-gray-100">
-                <textarea id="memo" rows="2" placeholder="その他備考" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm"></textarea>
+                <textarea id="memo" rows="2" placeholder="その他備考" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none"></textarea>
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-slate-700 active:scale-95 transition-all">
@@ -103,26 +111,27 @@
             const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
             const client = supabase.createClient(URL, KEY);
 
-            // プレビュー機能の実装
-            function setupPreview(inputId, previewId) {
+            // プレビュー機能：ファイルが選択されたら画像を表示する
+            function handlePreview(inputId, containerId, imgId) {
                 const input = document.getElementById(inputId);
-                const preview = document.getElementById(previewId);
+                const container = document.getElementById(containerId);
+                const img = document.getElementById(imgId);
 
-                input.addEventListener('change', () => {
-                    const file = input.files[0];
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = (e) => {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
+                        reader.onload = (event) => {
+                            img.src = event.target.result;
+                            container.style.display = 'block';
                         };
                         reader.readAsDataURL(file);
                     }
                 });
             }
 
-            setupPreview('hook_image', 'hook_preview');
-            setupPreview('pitch_image', 'pitch_preview');
+            handlePreview('hook_image', 'hook_preview_container', 'hook_preview_img');
+            handlePreview('pitch_image', 'pitch_preview_container', 'pitch_preview_img');
 
             const form = document.getElementById('promoForm');
             const btn = document.getElementById('submitBtn');
@@ -162,6 +171,7 @@
                     document.getElementById('successMessage').classList.remove('hidden');
                 } catch (err) {
                     alert('エラー: ' + err.message);
+                } finally {
                     btn.disabled = false;
                     btn.innerText = "登録する";
                 }
