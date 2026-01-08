@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>イベント施策投稿フォーム</title>
+    <title>施策投稿フォーム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,19 +12,25 @@
         .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .accent-purple { background-color: #f3f0ff; border: 1px solid #e9e4ff; }
         input[type="radio"]:checked + span { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
+        
+        /* 1枚目の画像のような「点線」のセパレーター */
+        .border-dashed-top { border-top: 1px dashed #e2e8f0; }
     </style>
 </head>
-<body class="p-4 pb-12">
+<body class="p-4 pb-12 text-gray-700">
+
     <div id="app" class="max-w-md mx-auto">
-        <div id="successMessage" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-white/90">
-            <div class="bg-white p-8 rounded-3xl card-shadow border text-center w-80">
+        <div id="successMessage" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm">
+            <div class="bg-white p-8 rounded-3xl card-shadow border border-purple-100 text-center w-80">
                 <div class="text-green-500 text-5xl mb-4"><i class="fa-solid fa-circle-check"></i></div>
                 <h2 class="text-xl font-bold mb-4">送信完了！</h2>
-                <button onclick="location.reload()" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold">戻る</button>
+                <button onclick="location.reload()" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md">続けて投稿する</button>
             </div>
         </div>
 
-        <h1 class="text-lg font-bold mb-6">📌 施策内容の登録</h1>
+        <div class="mb-6 flex items-center gap-2 text-lg font-bold">
+            <span class="text-orange-500">📌</span> <h1>施策内容の登録</h1>
+        </div>
 
         <form id="promoForm" class="space-y-4">
             <div class="bg-white p-5 rounded-2xl card-shadow border border-gray-100 space-y-3">
@@ -33,34 +39,60 @@
                 <input type="text" id="store_name" placeholder="店舗名・会場" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
             </div>
 
-            <div class="accent-purple p-5 rounded-2xl card-shadow space-y-4">
-                <p class="text-xs font-bold text-gray-600">コンテンツ券面はある？</p>
+            <div class="accent-purple p-5 rounded-3xl card-shadow space-y-4">
+                <p class="text-[11px] font-bold text-gray-500 px-1">コンテンツ関連の券面はある？</p>
                 <div class="grid grid-cols-2 gap-2">
-                    <label><input type="radio" name="has_special_design" value="true" class="hidden"><span class="block text-center p-3 bg-white border rounded-xl text-sm">あり</span></label>
-                    <label><input type="radio" name="has_special_design" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border rounded-xl text-sm">なし</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_special_design" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">あり</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_special_design" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">なし</span></label>
                 </div>
-                <p class="text-xs font-bold text-gray-600">カード入会特典はある？</p>
+                <p class="text-[11px] font-bold text-gray-500 px-1">カード入会特典はある？</p>
                 <div class="grid grid-cols-2 gap-2">
-                    <label><input type="radio" name="has_signup_bonus" value="true" class="hidden"><span class="block text-center p-3 bg-white border rounded-xl text-sm">あり</span></label>
-                    <label><input type="radio" name="has_signup_bonus" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border rounded-xl text-sm">なし</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="true" class="hidden"><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">あり</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="has_signup_bonus" value="false" class="hidden" checked><span class="block text-center p-3 bg-white border border-gray-200 rounded-xl text-sm font-medium">なし</span></label>
                 </div>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl card-shadow border">
-                <label class="text-sm font-bold block mb-2">フック内容</label>
-                <textarea id="hook_content" rows="2" class="w-full p-2 bg-gray-50 border rounded-lg text-sm"></textarea>
-                <input type="file" id="hook_image" accept="image/*" class="mt-2 text-xs">
+            <div class="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center gap-2 text-sm font-bold">
+                        <span class="text-orange-400">💬</span> フック内容
+                    </div>
+                    <textarea id="hook_content" rows="3" placeholder="最初の声掛けなど" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-purple-300"></textarea>
+                </div>
+                <div class="bg-gray-50 p-3 border-dashed-top">
+                    <label class="flex items-center justify-center gap-2 w-full py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-camera text-gray-400"></i>
+                        <span>写真を追加</span>
+                        <input type="file" id="hook_image" accept="image/*" class="hidden">
+                    </label>
+                    <div id="hook_file_name" class="hidden text-[10px] text-purple-600 font-bold mt-2 text-center">画像が選択されました</div>
+                </div>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl card-shadow border">
-                <label class="text-sm font-bold block mb-2">ひきこみ内容</label>
-                <textarea id="pitch_content" rows="2" class="w-full p-2 bg-gray-50 border rounded-lg text-sm"></textarea>
-                <input type="file" id="pitch_image" accept="image/*" class="mt-2 text-xs">
+            <div class="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center gap-2 text-sm font-bold">
+                        <span class="text-green-400">📢</span> ひきこみ内容
+                    </div>
+                    <textarea id="pitch_content" rows="3" placeholder="メリットの伝え方など" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-purple-300"></textarea>
+                </div>
+                <div class="bg-gray-50 p-3 border-dashed-top">
+                    <label class="flex items-center justify-center gap-2 w-full py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-image text-gray-400"></i>
+                        <span>写真を追加</span>
+                        <input type="file" id="pitch_image" accept="image/*" class="hidden">
+                    </label>
+                    <div id="pitch_file_name" class="hidden text-[10px] text-purple-600 font-bold mt-2 text-center">画像が選択されました</div>
+                </div>
             </div>
 
-            <textarea id="memo" placeholder="備考" class="w-full p-3 bg-white border rounded-2xl card-shadow text-sm"></textarea>
+            <div class="bg-white p-4 rounded-2xl card-shadow border border-gray-100">
+                <textarea id="memo" rows="2" placeholder="その他備考" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl text-sm"></textarea>
+            </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg">登録する</button>
+            <button type="submit" id="submitBtn" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-slate-700 active:scale-95 transition-all">
+                登録する
+            </button>
         </form>
     </div>
 
@@ -70,16 +102,26 @@
             const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4dHF0dmFjcnJzaGJzbHNubnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NTY3MzEsImV4cCI6MjA4MzQzMjczMX0.YKnc2YMNR2VEtXIfCeZTsqu1ielPY002iFQtGRWIMQs';
             const client = supabase.createClient(URL, KEY);
 
+            // ファイル選択時に「選択されました」と表示する
+            ['hook_image', 'pitch_image'].forEach(id => {
+                document.getElementById(id).addEventListener('change', e => {
+                    const label = document.getElementById(id + '_file_name');
+                    if (e.target.files.length > 0) {
+                        label.classList.remove('hidden');
+                        label.innerText = '✓ ' + e.target.files[0].name;
+                    }
+                });
+            });
+
             const form = document.getElementById('promoForm');
             const btn = document.getElementById('submitBtn');
 
             form.onsubmit = async (e) => {
                 e.preventDefault();
                 btn.disabled = true;
-                btn.innerText = "送信中...";
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 送信中...';
 
                 try {
-                    // 画像アップロード処理
                     const upload = async (id) => {
                         const file = document.getElementById(id).files[0];
                         if (!file) return null;
@@ -92,7 +134,6 @@
                     const hImg = await upload('hook_image');
                     const pImg = await upload('pitch_image');
 
-                    // データベース登録
                     const { error } = await client.from('event_promotions').insert([{
                         staff_name: document.getElementById('staff_name').value,
                         event_name: document.getElementById('event_name').value,
@@ -109,8 +150,7 @@
                     if (error) throw error;
                     document.getElementById('successMessage').classList.remove('hidden');
                 } catch (err) {
-                    alert('エラーが発生しました: ' + err.message);
-                    console.error(err);
+                    alert('エラー: ' + err.message);
                 } finally {
                     btn.disabled = false;
                     btn.innerText = "登録する";
