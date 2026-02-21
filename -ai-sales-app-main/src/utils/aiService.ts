@@ -8,8 +8,8 @@ export class AIService {
     try {
       const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY || '';
       if (!apiKey) {
-        console.error('VITE_OPENROUTER_API_KEY is not set. Please add it to your .env file.');
-        throw new Error('VITE_OPENROUTER_API_KEY is not configured');
+        console.warn('VITE_OPENROUTER_API_KEY is not set. Using fallback responses. Please add it to your .env file.');
+        return this.getFallbackResponse(mode);
       }
 
       const systemPrompt = this.getSystemPrompt(mode, scenario);
