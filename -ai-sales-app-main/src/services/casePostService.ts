@@ -29,13 +29,17 @@ type UserRow = {
 export async function fetchOtherCasePosts(): Promise<CommunityPost[]> {
   // 1) Fetch posts in 'other' category
   const { data: posts, error } = await supabase
-    .from<CasePostRow>('case_posts')
+    .from('case_posts')
     .select('*')
     .eq('category', 'other')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .returns<CasePostRow[]>();
 
   if (error) {
-    console.error('Failed to fetch case_posts (other):', error);
+    console.error('Failed to fetch case_posts (other):', error.message, 'code:', error.code, 'details:', error.details);
+    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
+      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
+    }
     throw new Error(error.message || 'fetchOtherCasePosts failed');
   }
 
@@ -50,12 +54,13 @@ export async function fetchOtherCasePosts(): Promise<CommunityPost[]> {
   let usersById = new Map<string, UserRow>();
   if (authorIds.length > 0) {
     const { data: users, error: usersError } = await supabase
-      .from<UserRow>('users')
+      .from('users')
       .select('id,name,department,avatar')
-      .in('id', authorIds);
+      .in('id', authorIds)
+      .returns<UserRow[]>();
 
     if (usersError) {
-      console.error('Failed to fetch users for case_posts:', usersError);
+      console.error('Failed to fetch users for case_posts:', usersError.message);
     } else if (users) {
       for (const u of users) usersById.set(u.id, u);
     }
@@ -121,7 +126,10 @@ export async function createOtherCasePost(params: {
     .insert([payload]);
 
   if (error) {
-    console.error('Failed to insert other case post:', error);
+    console.error('Failed to insert other case post:', error.message, 'code:', error.code, 'details:', error.details);
+    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
+      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
+    }
     return false;
   }
   return true;
@@ -134,24 +142,29 @@ export async function fetchFavoriteEventPosts(params?: {
   const sinceIso = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000).toISOString();
 
   let { data: posts, error } = await supabase
-    .from<CasePostRow>('case_posts')
+    .from('case_posts')
     .select('*')
     .eq('category', 'favorite_event')
     .gte('created_at', sinceIso)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .returns<CasePostRow[]>();
 
   if (error) {
-    console.error('Failed to fetch favorite_event posts:', error);
+    console.error('Failed to fetch favorite_event posts:', error.message, 'code:', error.code, 'details:', error.details);
+    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
+      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
+    }
     throw new Error(error.message || 'fetchFavoriteEventPosts failed');
   }
 
   // fallback: if no posts in recent window, fetch without date filter
   if (!posts || posts.length === 0) {
     const res = await supabase
-      .from<CasePostRow>('case_posts')
+      .from('case_posts')
       .select('*')
       .eq('category', 'favorite_event')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .returns<CasePostRow[]>();
     if (!res.error) posts = res.data || [];
   }
 
@@ -159,9 +172,10 @@ export async function fetchFavoriteEventPosts(params?: {
   let usersById = new Map<string, UserRow>();
   if (authorIds.length > 0) {
     const { data: users, error: usersError } = await supabase
-      .from<UserRow>('users')
+      .from('users')
       .select('id,name,department,avatar')
-      .in('id', authorIds);
+      .in('id', authorIds)
+      .returns<UserRow[]>();
     if (!usersError && users) for (const u of users) usersById.set(u.id, u);
   }
 
