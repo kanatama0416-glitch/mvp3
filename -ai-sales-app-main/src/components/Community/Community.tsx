@@ -25,13 +25,15 @@ import { CommunityPost } from '../../types';
 import PostForm from './PostForm';
 import PostCard from './PostCard';
 import PostDetail from './PostDetail';
-import { fetchOtherCasePosts } from '../../services/casePostService';
+import { fetchOtherCasePosts, createOtherCasePost } from '../../services/casePostService';
+import { useAuth } from '../../hooks/useAuth';
 
 type ViewMode = 'list' | 'create' | 'detail';
 type SortBy = 'latest' | 'popular' | 'views' | 'trending';
 type FilterBy = 'all' | 'public' | 'department' | 'theme';
 
 export default function Community({ reloadKey = 0 }: { reloadKey?: number }) {
+  const { user } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -79,47 +81,35 @@ export default function Community({ reloadKey = 0 }: { reloadKey?: number }) {
     }
   ]);
 
-  const handleCreatePost = (postData: any) => {
-    const newPost: CommunityPost = {
-      id: Date.now().toString(),
-      ...postData,
-      author: {
-        name: '田中 太郎',
-        department: 'カード口コミ部',
-        avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-      },
-      reactions: { like: 0, empathy: 0, helpful: 0 },
-      comments: [],
-      views: 0,
-      createdAt: new Date(),
-      aiSummary: 'AI分析中...',
-      isApprovedForAI: false
-    };
-    
-    // AIによる自動タグ提案とイベント判定のシミュレーション
-    setTimeout(() => {
-      const updatedPost = { ...newPost };
-      
-      // イベント関連投稿の自動判定
-      const eventKeywords = ['呪術廻戦', 'MGAフェス', 'バレンタイン', 'イベント'];
-      const isEventRelated = eventKeywords.some(keyword => 
-        newPost.title.includes(keyword) || 
-        newPost.tags.some(tag => tag.includes(keyword))
-      );
-      
-      if (isEventRelated) {
-        updatedPost.aiSummary = 'イベント関連の成功事例として自動分類されました。イベントページにも反映されます。';
+  const handleCreatePost = async (postData: any) => {
+    if (!user || user.id === 'guest') {
+      alert('投稿するにはログインしてください。');
+      return;
+    }
+
+    try {
+      const success = await createOtherCasePost({
+        authorId: user.id,
+        title: postData.title,
+        situation: postData.situation,
+        approach: postData.innovation,
+        result: postData.result,
+        notes: postData.learning,
+        tags: postData.tags,
+      });
+
+      if (success) {
+        // DB保存成功後、最新データを再取得
+        const data = await fetchOtherCasePosts();
+        setPosts(data);
+        setViewMode('list');
       } else {
-        updatedPost.aiSummary = 'AI分析完了：効果的な接客テクニックが含まれています。';
+        alert('投稿に失敗しました。もう一度お試しください。');
       }
-      
-      setPosts(prevPosts => 
-        prevPosts.map(p => p.id === newPost.id ? updatedPost : p)
-      );
-    }, 2000);
-    
-    setPosts([newPost, ...posts]);
-    setViewMode('list');
+    } catch (e) {
+      console.error('投稿送信中にエラーが発生しました:', e);
+      alert('投稿送信中にエラーが発生しました。');
+    }
   };
 
   const handleReaction = (postId: string, reactionType: 'like' | 'empathy' | 'helpful') => {
