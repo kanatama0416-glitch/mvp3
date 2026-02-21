@@ -1,5 +1,5 @@
 -- Events table
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE events (
 );
 
 -- User event participation table
-CREATE TABLE user_event_participation (
+CREATE TABLE IF NOT EXISTS user_event_participation (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   event_id UUID REFERENCES events(id) ON DELETE CASCADE,
@@ -33,7 +33,7 @@ CREATE TABLE user_event_participation (
 );
 
 -- Event best practices table (linking community posts to events)
-CREATE TABLE event_best_practices (
+CREATE TABLE IF NOT EXISTS event_best_practices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID REFERENCES events(id) ON DELETE CASCADE,
   post_id UUID REFERENCES community_posts(id) ON DELETE CASCADE,
@@ -44,7 +44,7 @@ CREATE TABLE event_best_practices (
 );
 
 -- Event metrics tracking
-CREATE TABLE event_metrics (
+CREATE TABLE IF NOT EXISTS event_metrics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID REFERENCES events(id) ON DELETE CASCADE,
   date DATE NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE event_metrics (
 );
 
 -- Event stores table (for detailed store participation)
-CREATE TABLE event_stores (
+CREATE TABLE IF NOT EXISTS event_stores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID REFERENCES events(id) ON DELETE CASCADE,
   store_name TEXT NOT NULL,
@@ -71,17 +71,17 @@ CREATE TABLE event_stores (
 );
 
 -- Indexes for better query performance
-CREATE INDEX idx_events_status ON events(status);
-CREATE INDEX idx_events_start_date ON events(start_date);
-CREATE INDEX idx_events_end_date ON events(end_date);
-CREATE INDEX idx_events_event_type ON events(event_type);
-CREATE INDEX idx_user_event_participation_user_id ON user_event_participation(user_id);
-CREATE INDEX idx_user_event_participation_event_id ON user_event_participation(event_id);
-CREATE INDEX idx_event_best_practices_event_id ON event_best_practices(event_id);
-CREATE INDEX idx_event_best_practices_post_id ON event_best_practices(post_id);
-CREATE INDEX idx_event_metrics_event_id ON event_metrics(event_id);
-CREATE INDEX idx_event_metrics_date ON event_metrics(date);
-CREATE INDEX idx_event_stores_event_id ON event_stores(event_id);
+CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
+CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date);
+CREATE INDEX IF NOT EXISTS idx_events_end_date ON events(end_date);
+CREATE INDEX IF NOT EXISTS idx_events_event_type ON events(event_type);
+CREATE INDEX IF NOT EXISTS idx_user_event_participation_user_id ON user_event_participation(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_event_participation_event_id ON user_event_participation(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_best_practices_event_id ON event_best_practices(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_best_practices_post_id ON event_best_practices(post_id);
+CREATE INDEX IF NOT EXISTS idx_event_metrics_event_id ON event_metrics(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_metrics_date ON event_metrics(date);
+CREATE INDEX IF NOT EXISTS idx_event_stores_event_id ON event_stores(event_id);
 
 -- Enable Row Level Security
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;

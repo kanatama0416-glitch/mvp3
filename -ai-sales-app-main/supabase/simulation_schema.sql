@@ -117,15 +117,15 @@ CREATE TABLE IF NOT EXISTS simulation_conversation_logs (
 );
 
 -- インデックス作成
-CREATE INDEX idx_simulation_scenarios_difficulty ON simulation_scenarios(difficulty);
-CREATE INDEX idx_simulation_scenarios_category ON simulation_scenarios(category);
-CREATE INDEX idx_customer_roleplay_scenario_id ON customer_roleplay(scenario_id);
-CREATE INDEX idx_user_learning_history_user_id ON user_learning_history(user_id);
-CREATE INDEX idx_user_learning_history_scenario_id ON user_learning_history(scenario_id);
-CREATE INDEX idx_simulation_feedback_learning_history_id ON simulation_feedback(learning_history_id);
-CREATE INDEX idx_learning_materials_type ON learning_materials(material_type);
-CREATE INDEX idx_scenario_steps_scenario_id ON scenario_steps(scenario_id);
-CREATE INDEX idx_conversation_logs_learning_history_id ON simulation_conversation_logs(learning_history_id);
+CREATE INDEX IF NOT EXISTS idx_simulation_scenarios_difficulty ON simulation_scenarios(difficulty);
+CREATE INDEX IF NOT EXISTS idx_simulation_scenarios_category ON simulation_scenarios(category);
+CREATE INDEX IF NOT EXISTS idx_customer_roleplay_scenario_id ON customer_roleplay(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_user_learning_history_user_id ON user_learning_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_learning_history_scenario_id ON user_learning_history(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_simulation_feedback_learning_history_id ON simulation_feedback(learning_history_id);
+CREATE INDEX IF NOT EXISTS idx_learning_materials_type ON learning_materials(material_type);
+CREATE INDEX IF NOT EXISTS idx_scenario_steps_scenario_id ON scenario_steps(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_logs_learning_history_id ON simulation_conversation_logs(learning_history_id);
 
 -- Row Level Security有効化
 ALTER TABLE simulation_scenarios ENABLE ROW LEVEL SECURITY;

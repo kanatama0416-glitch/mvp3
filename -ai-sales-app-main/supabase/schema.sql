@@ -1,5 +1,5 @@
 -- Users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE users (
 );
 
 -- Scenarios table
-CREATE TABLE scenarios (
+CREATE TABLE IF NOT EXISTS scenarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   type TEXT CHECK (type IN ('video', 'document', 'audio', 'simulation')) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE scenarios (
 );
 
 -- Learning sessions table
-CREATE TABLE learning_sessions (
+CREATE TABLE IF NOT EXISTS learning_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   scenario_id UUID REFERENCES scenarios(id) ON DELETE CASCADE,
@@ -39,7 +39,7 @@ CREATE TABLE learning_sessions (
 );
 
 -- Messages table
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID REFERENCES learning_sessions(id) ON DELETE CASCADE,
   sender TEXT CHECK (sender IN ('user', 'ai')) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE messages (
 );
 
 -- Evaluations table
-CREATE TABLE evaluations (
+CREATE TABLE IF NOT EXISTS evaluations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID REFERENCES learning_sessions(id) ON DELETE CASCADE,
   overall_score NUMERIC(4,2) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE evaluations (
 );
 
 -- Achievements table
-CREATE TABLE achievements (
+CREATE TABLE IF NOT EXISTS achievements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE achievements (
 );
 
 -- Learning plans table
-CREATE TABLE learning_plans (
+CREATE TABLE IF NOT EXISTS learning_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT NOT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE learning_plans (
 );
 
 -- Community posts table
-CREATE TABLE community_posts (
+CREATE TABLE IF NOT EXISTS community_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   situation TEXT NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE community_posts (
 );
 
 -- Community comments table
-CREATE TABLE community_comments (
+CREATE TABLE IF NOT EXISTS community_comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID REFERENCES community_posts(id) ON DELETE CASCADE,
   author_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -127,7 +127,7 @@ CREATE TABLE community_comments (
 );
 
 -- Post reactions table (for tracking user reactions)
-CREATE TABLE post_reactions (
+CREATE TABLE IF NOT EXISTS post_reactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID REFERENCES community_posts(id) ON DELETE CASCADE,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -137,7 +137,7 @@ CREATE TABLE post_reactions (
 );
 
 -- Growth records table
-CREATE TABLE growth_records (
+CREATE TABLE IF NOT EXISTS growth_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   date DATE NOT NULL,
@@ -151,17 +151,17 @@ CREATE TABLE growth_records (
 );
 
 -- Indexes for better query performance
-CREATE INDEX idx_learning_sessions_user_id ON learning_sessions(user_id);
-CREATE INDEX idx_learning_sessions_scenario_id ON learning_sessions(scenario_id);
-CREATE INDEX idx_messages_session_id ON messages(session_id);
-CREATE INDEX idx_evaluations_session_id ON evaluations(session_id);
-CREATE INDEX idx_achievements_user_id ON achievements(user_id);
-CREATE INDEX idx_community_posts_author_id ON community_posts(author_id);
-CREATE INDEX idx_community_posts_visibility ON community_posts(visibility);
-CREATE INDEX idx_community_comments_post_id ON community_comments(post_id);
-CREATE INDEX idx_post_reactions_post_id ON post_reactions(post_id);
-CREATE INDEX idx_post_reactions_user_id ON post_reactions(user_id);
-CREATE INDEX idx_growth_records_user_id ON growth_records(user_id);
+CREATE INDEX IF NOT EXISTS idx_learning_sessions_user_id ON learning_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_learning_sessions_scenario_id ON learning_sessions(scenario_id);
+CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
+CREATE INDEX IF NOT EXISTS idx_evaluations_session_id ON evaluations(session_id);
+CREATE INDEX IF NOT EXISTS idx_achievements_user_id ON achievements(user_id);
+CREATE INDEX IF NOT EXISTS idx_community_posts_author_id ON community_posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_community_posts_visibility ON community_posts(visibility);
+CREATE INDEX IF NOT EXISTS idx_community_comments_post_id ON community_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_reactions_post_id ON post_reactions(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_reactions_user_id ON post_reactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_growth_records_user_id ON growth_records(user_id);
 
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
