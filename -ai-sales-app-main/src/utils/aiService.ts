@@ -111,7 +111,7 @@ export class AIService {
   }
 
   private static getFallbackResponse(mode: 'customer' | 'staff' | 'consultation'): string {
-    const fallbacks: Record<string, string[]> = {
+    const fallbacks: Record<'customer' | 'staff' | 'consultation', string[]> = {
       customer: [
         'そうですね、もう少し詳しく教えていただけますか？',
         'なるほど、年会費はどのくらいでしょうか？',
