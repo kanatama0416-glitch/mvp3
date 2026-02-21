@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Bot, Leaf, Send, User } from 'lucide-react';
+import { AIService } from '../../utils/aiService';
 
 type ChatRole = 'assistant' | 'user';
 
@@ -12,47 +13,62 @@ interface ChatMessage {
 
 export default function Consultation() {
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'm1',
       role: 'assistant',
       text: 'こんにちは。接客やカード案内の悩みを気軽に相談してください。',
       time: '09:12'
-    },
-    {
-      id: 'm2',
-      role: 'user',
-      text: '忙しい時間帯でも自然に声をかけるコツはありますか？',
-      time: '09:13'
-    },
-    {
-      id: 'm3',
-      role: 'assistant',
-      text: '短く「確認→共感→提案」の順に。例:「今お急ぎですよね。お会計後に30秒だけご案内いいですか？」',
-      time: '09:13'
     }
   ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
+  const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isLoading) return;
 
+    const now = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
     const userMessage: ChatMessage = {
       id: `u-${Date.now()}`,
       role: 'user',
       text: trimmed,
-      time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
+      time: now
     };
 
-    const assistantMessage: ChatMessage = {
-      id: `a-${Date.now() + 1}`,
-      role: 'assistant',
-      text: 'ありがとうございます。状況の一言だけ教えてもらえれば、使えるフレーズを提案します。',
-      time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
+    setIsLoading(true);
+
+    try {
+      const context = messages
+        .filter(m => m.id !== 'm1')
+        .map(m => m.text);
+
+      const aiResponseText = await AIService.generateResponse(
+        trimmed,
+        'consultation',
+        '接客相談',
+        context
+      );
+
+      const assistantMessage: ChatMessage = {
+        id: `a-${Date.now() + 1}`,
+        role: 'assistant',
+        text: aiResponseText,
+        time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('AI response error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const messageRows = useMemo(() => messages, [messages]);
@@ -116,6 +132,19 @@ export default function Consultation() {
                 )}
               </div>
             ))}
+            {isLoading && (
+              <div className="flex items-start gap-3 justify-start">
+                <div className="w-9 h-9 rounded-full bg-green-100 text-success-green flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div className="max-w-[72%] space-y-1">
+                  <div className="px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm bg-white border border-green-100 text-gray-400 rounded-bl-md">
+                    入力中...
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
@@ -133,7 +162,12 @@ export default function Consultation() {
             </div>
             <button
               onClick={handleSend}
-              className="flex items-center gap-2 px-5 py-3 bg-success-green text-white rounded-xl hover:bg-emerald-green transition-colors shadow-sm"
+              disabled={isLoading}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl transition-colors shadow-sm ${
+                isLoading
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-success-green text-white hover:bg-emerald-green'
+              }`}
             >
               <Send className="w-4 h-4" />
               <span className="text-sm font-semibold">送信</span>
