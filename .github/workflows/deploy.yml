@@ -11,22 +11,30 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./-ai-sales-app-main
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: npm
           cache-dependency-path: -ai-sales-app-main/package-lock.json
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
@@ -34,13 +42,17 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
 
-      # ★ distができてるか確認（念のため）
       - name: List dist
         run: ls -la dist
 
-      - uses: actions/upload-pages-artifact@v3
+      # ✅ これがあると「distにindex.htmlが無い」を即発見できる
+      - name: Check built index.html
+        run: test -f dist/index.html && echo "✅ dist/index.html exists" || (echo "❌ dist/index.html NOT found" && exit 1)
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: -ai-sales-app-main/dist   # ★ここが核心（フルパスにする）
+          path: -ai-sales-app-main/dist
 
   deploy:
     needs: build
@@ -48,6 +60,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v4
