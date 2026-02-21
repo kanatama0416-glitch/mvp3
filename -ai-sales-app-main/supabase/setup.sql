@@ -14,7 +14,7 @@
 --   7. RLSポリシー（開発用）
 --   8. サンプルデータ（seed.sql, scenarios_seed.sql, simulation_seed.sql, events_seed.sql, posts_seed.sql）
 --
--- ⚠️ すべて IF NOT EXISTS / IF NOT EXISTS 付きなので
+-- ⚠️ すべて IF NOT EXISTS 付きなので
 --    既存テーブルがあっても安全に再実行できます。
 -- ============================================================
 
@@ -767,6 +767,7 @@ INSERT INTO users (name, email, department, role, avatar) VALUES
 ON CONFLICT (email) DO NOTHING;
 
 -- パスワード設定（add_password.sql）
+-- ⚠️ 開発・デモ用の平文パスワードです。本番環境では必ずハッシュ化してください。
 UPDATE users SET password = 'password123' WHERE email = 'tanaka@marui.co.jp';
 UPDATE users SET password = 'password123' WHERE email = 'sato@marui.co.jp';
 UPDATE users SET password = 'admin123' WHERE email = 'admin@marui.co.jp';
