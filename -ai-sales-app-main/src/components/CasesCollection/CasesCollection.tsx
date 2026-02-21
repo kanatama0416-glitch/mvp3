@@ -3,6 +3,8 @@ import { Plus, BookOpen } from 'lucide-react';
 import Events from '../Events/Events';
 import PostModal, { PostFormData } from './PostModal';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
+import { useAuth } from '../../hooks/useAuth';
+import { createOtherCasePost } from '../../services/casePostService';
 
 interface CasesCollectionProps {
   initialShowHookHelp?: boolean;
@@ -15,6 +17,7 @@ export default function CasesCollection({
 }: CasesCollectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!initialShowHookHelp) return;
@@ -26,9 +29,28 @@ export default function CasesCollection({
     return () => clearTimeout(timer);
   }, [initialShowHookHelp, onInitialHookHelpHandled]);
 
-  const handleSubmitPost = async (_data: PostFormData) => {
+  const handleSubmitPost = async (data: PostFormData) => {
     try {
-      // no-op
+      if (!user || user.id === 'guest') {
+        alert('投稿するにはログインしてください。');
+        return;
+      }
+
+      const success = await createOtherCasePost({
+        authorId: user.id,
+        title: data.title,
+        situation: data.situation,
+        approach: data.approach,
+        result: data.result || '',
+        notes: data.learning || '',
+        tags: data.tags,
+      });
+
+      if (success) {
+        alert('投稿が完了しました！');
+      } else {
+        alert('投稿に失敗しました。もう一度お試しください。');
+      }
     } catch (e) {
       console.error(e);
       alert('投稿送信中にエラーが発生しました。');

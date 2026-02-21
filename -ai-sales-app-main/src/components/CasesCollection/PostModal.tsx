@@ -2,6 +2,7 @@
 import { BookOpen, Search, X } from 'lucide-react';
 import { EVENT_TITLE_OPTIONS } from '../Events/Events';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
+import { suggestedTags } from '../../data/mockData';
 
 interface PostModalProps {
   isOpen: boolean;
@@ -11,24 +12,27 @@ interface PostModalProps {
 
 export interface PostFormData {
   title: string;
-  hook: string;
-  pullIn: string;
-  cardDescription: string;
-  attribute: string;
-  other: string;
+  eventName: string;
+  situation: string;
+  approach: string;
+  result: string;
+  learning: string;
+  tags: string[];
 }
 
 export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps) {
   const [searchText, setSearchText] = useState('');
   const [showEventList, setShowEventList] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
+  const [tagInput, setTagInput] = useState('');
   const [formData, setFormData] = useState<PostFormData>({
     title: '',
-    hook: '',
-    pullIn: '',
-    cardDescription: '',
-    attribute: '',
-    other: '',
+    eventName: '',
+    situation: '',
+    approach: '',
+    result: '',
+    learning: '',
+    tags: [],
   });
 
   const filteredEvents = useMemo(() => {
@@ -41,20 +45,30 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
     setSearchText('');
     setShowEventList(false);
     setShowHookHelp(false);
+    setTagInput('');
     setFormData({
       title: '',
-      hook: '',
-      pullIn: '',
-      cardDescription: '',
-      attribute: '',
-      other: '',
+      eventName: '',
+      situation: '',
+      approach: '',
+      result: '',
+      learning: '',
+      tags: [],
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) {
-      alert('タイトル（イベント）を選択してください。');
+      alert('タイトルを入力してください。');
+      return;
+    }
+    if (!formData.situation) {
+      alert('状況を入力してください。');
+      return;
+    }
+    if (!formData.approach) {
+      alert('工夫・アプローチを入力してください。');
       return;
     }
     onSubmit(formData);
@@ -68,9 +82,21 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
   };
 
   const handleSelectEvent = (eventName: string) => {
-    setFormData((prev) => ({ ...prev, title: eventName }));
+    setFormData((prev) => ({ ...prev, eventName: eventName }));
     setSearchText(eventName);
     setShowEventList(false);
+  };
+
+  const handleAddTag = (tag: string) => {
+    const normalized = tag.startsWith('#') ? tag : `#${tag}`;
+    if (normalized.length > 1 && !formData.tags.includes(normalized)) {
+      setFormData((prev) => ({ ...prev, tags: [...prev.tags, normalized] }));
+    }
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setFormData((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
   };
 
   if (!isOpen) return null;
@@ -99,8 +125,22 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
           </button>
 
           <div>
+            <label htmlFor="postTitle" className="block text-sm font-medium text-gray-700 mb-2">
+              タイトル <span className="text-vivid-red">*</span>
+            </label>
+            <input
+              id="postTitle"
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
+              placeholder="例: アニメファンのお客様への効果的なカード口コミ"
+            />
+          </div>
+
+          <div>
             <label htmlFor="titleSearch" className="block text-sm font-medium text-gray-700 mb-2">
-              タイトル（イベントから選択） <span className="text-vivid-red">*</span>
+              関連イベント（任意）
             </label>
             <div className="relative">
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -111,8 +151,8 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
                 onChange={(e) => {
                   setSearchText(e.target.value);
                   setShowEventList(true);
-                  if (e.target.value !== formData.title) {
-                    setFormData((prev) => ({ ...prev, title: '' }));
+                  if (e.target.value !== formData.eventName) {
+                    setFormData((prev) => ({ ...prev, eventName: '' }));
                   }
                 }}
                 onFocus={() => setShowEventList(true)}
@@ -140,79 +180,118 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
               </div>
             )}
 
-            {formData.title && (
-              <p className="mt-2 text-xs text-gray-600">選択中: {formData.title}</p>
+            {formData.eventName && (
+              <p className="mt-2 text-xs text-gray-600">選択中: {formData.eventName}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="hook" className="block text-sm font-medium text-gray-700 mb-2">
-              フック
+            <label htmlFor="situation" className="block text-sm font-medium text-gray-700 mb-2">
+              状況 <span className="text-vivid-red">*</span>
             </label>
             <textarea
-              id="hook"
-              value={formData.hook}
-              onChange={(e) => setFormData((prev) => ({ ...prev, hook: e.target.value }))}
+              id="situation"
+              value={formData.situation}
+              onChange={(e) => setFormData((prev) => ({ ...prev, situation: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="フックの内容を入力"
+              placeholder="例: 20代男性、アニメイベントでグッズ購入、初回来店"
             />
           </div>
 
           <div>
-            <label htmlFor="pullIn" className="block text-sm font-medium text-gray-700 mb-2">
-              引き込み
+            <label htmlFor="approach" className="block text-sm font-medium text-gray-700 mb-2">
+              工夫・アプローチ <span className="text-vivid-red">*</span>
             </label>
             <textarea
-              id="pullIn"
-              value={formData.pullIn}
-              onChange={(e) => setFormData((prev) => ({ ...prev, pullIn: e.target.value }))}
+              id="approach"
+              value={formData.approach}
+              onChange={(e) => setFormData((prev) => ({ ...prev, approach: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="引き込みの内容を入力"
+              placeholder="例: お客様の好きなアニメ作品について会話を始め、関連商品でポイントが貯まることを具体例で説明"
             />
           </div>
 
           <div>
-            <label htmlFor="cardDescription" className="block text-sm font-medium text-gray-700 mb-2">
-              カード説明
+            <label htmlFor="result" className="block text-sm font-medium text-gray-700 mb-2">
+              結果
             </label>
             <textarea
-              id="cardDescription"
-              value={formData.cardDescription}
-              onChange={(e) => setFormData((prev) => ({ ...prev, cardDescription: e.target.value }))}
+              id="result"
+              value={formData.result}
+              onChange={(e) => setFormData((prev) => ({ ...prev, result: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="カード説明の内容を入力"
+              placeholder="例: お客様が興味を示し、その場でカード申込み"
             />
           </div>
 
           <div>
-            <label htmlFor="attribute" className="block text-sm font-medium text-gray-700 mb-2">
-              属性
+            <label htmlFor="learning" className="block text-sm font-medium text-gray-700 mb-2">
+              学び
             </label>
             <textarea
-              id="attribute"
-              value={formData.attribute}
-              onChange={(e) => setFormData((prev) => ({ ...prev, attribute: e.target.value }))}
+              id="learning"
+              value={formData.learning}
+              onChange={(e) => setFormData((prev) => ({ ...prev, learning: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="属性の内容を入力"
+              placeholder="例: お客様の趣味に寄り添った具体例を示すことで、カードの価値を実感してもらえる"
             />
           </div>
 
           <div>
-            <label htmlFor="other" className="block text-sm font-medium text-gray-700 mb-2">
-              その他
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              タグ
             </label>
-            <textarea
-              id="other"
-              value={formData.other}
-              onChange={(e) => setFormData((prev) => ({ ...prev, other: e.target.value }))}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="その他の補足を入力"
-            />
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="hover:text-red-600"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (tagInput.trim()) handleAddTag(tagInput.trim());
+                  }
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent text-sm"
+                placeholder="タグを入力してEnter"
+              />
+            </div>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {suggestedTags
+                .filter((t) => !formData.tags.includes(t))
+                .slice(0, 8)
+                .map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleAddTag(tag)}
+                    className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                  >
+                    {tag}
+                  </button>
+                ))}
+            </div>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
