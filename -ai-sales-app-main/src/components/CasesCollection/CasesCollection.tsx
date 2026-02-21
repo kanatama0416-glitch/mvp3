@@ -43,7 +43,7 @@ export default function CasesCollection({
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">ノウハウ集</h1>
-        <p className="text-gray-600 mt-1">イベント事例の好事例をまとめています</p>
+        <p className="text-gray-600 mt-1">イベントの好事例をまとめています</p>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
