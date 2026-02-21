@@ -6,11 +6,7 @@ export class AIService {
     context: string[] = []
   ): Promise<string> {
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      if (!apiKey) {
-        console.error('VITE_OPENROUTER_API_KEY is not set');
-        return this.getFallbackResponse(mode);
-      }
+      const apiKey = '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';
 
       const systemPrompt = this.getSystemPrompt(mode, scenario);
 
