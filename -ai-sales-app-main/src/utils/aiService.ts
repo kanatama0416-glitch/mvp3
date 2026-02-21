@@ -1,7 +1,7 @@
 export class AIService {
   static async generateResponse(
     message: string, 
-    mode: 'customer' | 'staff',
+    mode: 'customer' | 'staff' | 'consultation',
     scenario: string,
     context: string[] = []
   ): Promise<string> {
@@ -74,7 +74,19 @@ export class AIService {
     }
   }
 
-  private static getSystemPrompt(mode: 'customer' | 'staff', scenario: string): string {
+  private static getSystemPrompt(mode: 'customer' | 'staff' | 'consultation', scenario: string): string {
+    if (mode === 'consultation') {
+      return `あなたは接客スキル向上のためのAI相談アシスタントです。
+
+【あなたの役割】
+- ユーザーの接客やカード案内に関する悩みや質問に答える
+- 具体的なフレーズや対応方法を提案する
+- 短く分かりやすく、実践的なアドバイスをする
+- 1-3文程度の自然な長さで応答する
+
+重要：常にプロフェッショナルで親しみやすい口調で応答してください。`;
+    }
+
     if (mode === 'staff') {
       return `あなたは接客シミュレーションのお客様役です。シナリオ「${scenario}」に基づいて、お客様として自然に反応してください。
 
@@ -98,8 +110,8 @@ export class AIService {
     }
   }
 
-  private static getFallbackResponse(mode: 'customer' | 'staff'): string {
-    const fallbacks = {
+  private static getFallbackResponse(mode: 'customer' | 'staff' | 'consultation'): string {
+    const fallbacks: Record<string, string[]> = {
       customer: [
         'そうですね、もう少し詳しく教えていただけますか？',
         'なるほど、年会費はどのくらいでしょうか？',
@@ -111,6 +123,12 @@ export class AIService {
         'かしこまりました。お客様に最適なカードをご案内いたします。',
         'そうですね、その点について詳しくお話しします。',
         'お客様のライフスタイルに合った最適なカードをご案内いたします。'
+      ],
+      consultation: [
+        '具体的な場面を教えていただけると、より的確なアドバイスができます。',
+        'なるほど、その状況でしたらこういったアプローチが効果的かもしれません。',
+        '良い質問ですね。まず基本的なポイントからお伝えします。',
+        'そうですね、実践的なフレーズをいくつかご提案しますね。'
       ]
     };
     
