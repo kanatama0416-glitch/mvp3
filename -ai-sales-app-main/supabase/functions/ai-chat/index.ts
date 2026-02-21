@@ -29,8 +29,12 @@ Deno.serve(async (req: Request) => {
 
     const { message, mode, scenario, context = [] }: ChatRequest = await req.json();
 
-    // Use the provided API key
-    const apiKey = "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";
+    // Read API key from environment variable (set via Supabase secrets)
+    const apiKey = Deno.env.get("OPENROUTER_API_KEY") || "";
+    if (!apiKey) {
+      console.error("OPENROUTER_API_KEY environment variable is not set");
+      throw new Error("OPENROUTER_API_KEY environment variable is not configured");
+    }
 
     // Create system prompt - AI always plays the customer role
     const systemPrompt = `あなたはアニメイベント会場でグッズを購入し、レジでお会計をしているお客様です。店員のクレジットカード口コミに対して、お客様として自然に反応してください：
