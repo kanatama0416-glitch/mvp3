@@ -1,158 +1,39 @@
 # データベースセットアップガイド
 
-## エラーの原因
+## 🚀 かんたんセットアップ（推奨）
 
-`learning_sessions` テーブルが存在しないエラーが発生しています。
-これは、**基本スキーマがデータベースに適用されていない**ためです。
+**`setup.sql` を Supabase SQL Editor にコピペして実行するだけ！**
 
----
+📄 ファイル: **`setup.sql`**
 
-## ✅ 正しい実行順序
+このファイル1つに以下がすべて含まれています：
 
-以下の順序でSupabase SQL Editorで実行してください：
+| 内容 | テーブル |
+|------|---------|
+| 基本スキーマ | users, scenarios, learning_sessions, messages, evaluations, achievements, learning_plans, community_posts, community_comments, post_reactions, growth_records |
+| シミュレーション機能 | simulation_scenarios, customer_roleplay, user_learning_history, simulation_feedback, learning_materials, scenario_steps, simulation_conversation_logs |
+| イベント管理 | events, user_event_participation, event_best_practices, event_metrics, event_stores |
+| 投稿機能 | case_posts |
+| イベント知識ベース | event_knowledge_base |
+| マイグレーション | password カラム追加、area カラム追加、learning_sessions 拡張 |
+| RLSポリシー | 全テーブルの Row Level Security 設定 |
+| サンプルデータ | デモユーザー3名、シナリオ8件、イベント9件 |
 
-### 1️⃣ **基本スキーマの作成**（必須）
+### 手順
 
-```sql
--- 1. メインスキーマ（usersテーブル、learning_sessionsテーブルなど）
-```
-📄 ファイル: `schema.sql`
+1. https://app.supabase.com/ にログイン → プロジェクトを選択
+2. 左メニューから **SQL Editor** → **New query**
+3. **`setup.sql`** の内容を全てコピー＆ペースト
+4. **Run** ボタンをクリック
+5. 完了！ 🎉
 
-このファイルには以下のテーブルが含まれています：
-- users
-- scenarios
-- **learning_sessions** ← これが必要！
-- messages
-- evaluations
-- achievements
-- learning_plans
-- community_posts
-- community_comments
-- post_reactions
-- growth_records
+> ⚠️ すべて `IF NOT EXISTS` 付きなので、既にテーブルがある場合も安全に再実行できます。
 
 ---
 
-### 2️⃣ **拡張スキーマの作成**（推奨）
+## 🔍 セットアップ後の確認
 
-```sql
--- 2. AIシミュレーション機能
-```
-📄 ファイル: `simulation_schema.sql`
-
-```sql
--- 3. イベント管理機能
-```
-📄 ファイル: `events_schema.sql`
-
-```sql
--- 4. 投稿機能（追加スキーマ）
-```
-📄 ファイル: `posts_schema.sql`
-
-```sql
--- 5. ユーザーイベント参加
-```
-📄 ファイル: `user_participating_events_schema.sql`
-
----
-
-### 3️⃣ **マイグレーション（フィールド追加）**
-
-```sql
--- 6. パスワードフィールド追加
-```
-📄 ファイル: `add_password.sql`
-
-```sql
--- 7. イベントエリアフィールド追加
-```
-📄 ファイル: `events_area_migration.sql`
-
-```sql
--- 8. learning_sessionsテーブル拡張
-```
-📄 ファイル: `learning_sessions_enhancement.sql`
-
----
-
-### 4️⃣ **サンプルデータ投入**（オプション）
-
-```sql
--- 9. ユーザーサンプルデータ
-```
-📄 ファイル: `seed.sql`
-
-```sql
--- 10. シナリオサンプルデータ
-```
-📄 ファイル: `scenarios_seed.sql`
-
-```sql
--- 11. シミュレーションサンプルデータ
-```
-📄 ファイル: `simulation_seed.sql`
-
-```sql
--- 12. イベントサンプルデータ
-```
-📄 ファイル: `events_seed.sql`
-
-```sql
--- 13. アニメゲームイベントサンプルデータ
-```
-📄 ファイル: `events_anime_game_seed.sql`
-
-```sql
--- 14. 投稿サンプルデータ
-```
-📄 ファイル: `posts_seed.sql`
-
----
-
-## 🚀 実行手順（Supabase Studio）
-
-### ステップ1: Supabaseにログイン
-1. https://app.supabase.com/ にアクセス
-2. プロジェクトを選択
-
-### ステップ2: SQL Editorを開く
-1. 左メニューから **SQL Editor** を選択
-2. **New query** をクリック
-
-### ステップ3: スキーマを順番に実行
-
-#### まず最初に必ず実行:
-```sql
--- schema.sql の内容を全てコピー＆ペーストして実行
-```
-
-#### 成功を確認したら:
-```sql
--- learning_sessions_enhancement.sql の内容を実行
-```
-
----
-
-## ⚠️ 重要な注意点
-
-### 1. **schema.sql を最初に実行しないとエラーが出ます**
-   - `learning_sessions` テーブルはここで作成されます
-   - 他のテーブルも依存関係があるため順序が重要
-
-### 2. **既存データがある場合**
-   - テーブルがすでに存在する場合は `CREATE TABLE` がエラーになります
-   - その場合は、既存テーブルに対してマイグレーションのみ実行
-
-### 3. **外部キー制約**
-   - 親テーブルが存在しないと子テーブルは作成できません
-   - 例: `users` テーブルがないと `learning_sessions` は作れません
-
----
-
-## 🔍 現在のテーブル確認方法
-
-Supabase SQL Editorで以下を実行して、現在のテーブル一覧を確認できます：
+Supabase SQL Editorで以下を実行して、テーブル一覧を確認できます：
 
 ```sql
 SELECT table_name
@@ -163,23 +44,55 @@ ORDER BY table_name;
 
 ---
 
-## 📝 次のステップ
+## 📁 個別ファイルで実行する場合（上級者向け）
 
-1. ✅ `schema.sql` を実行
-2. ✅ テーブル作成を確認
-3. ✅ `learning_sessions_enhancement.sql` を実行
-4. ✅ 他の拡張スキーマを必要に応じて実行
-5. ✅ サンプルデータを投入（テスト用）
+`setup.sql` を使わず個別に実行したい場合は、以下の順序で実行してください。
+**順序を間違えると外部キーエラーが出ます。**
+
+### 1️⃣ 基本スキーマ（必須）
+| 順番 | ファイル | 内容 |
+|------|---------|------|
+| 1 | `schema.sql` | users, scenarios, learning_sessions 等の基本テーブル |
+
+### 2️⃣ 拡張スキーマ（推奨）
+| 順番 | ファイル | 内容 |
+|------|---------|------|
+| 2 | `simulation_schema.sql` | AIシミュレーション機能 |
+| 3 | `events_schema.sql` | イベント管理機能 |
+| 4 | `posts_schema.sql` | 投稿機能（case_posts） |
+| 5 | `user_participating_events_schema.sql` | ユーザーイベント参加 |
+| 6 | `create_event_knowledge_base.sql` | イベント知識ベース |
+
+### 3️⃣ マイグレーション
+| 順番 | ファイル | 内容 |
+|------|---------|------|
+| 7 | `add_password.sql` | パスワードカラム追加 |
+| 8 | `events_area_migration.sql` | イベント area カラム追加 |
+| 9 | `learning_sessions_enhancement.sql` | learning_sessions 拡張 |
+
+### 4️⃣ RLSポリシー修正
+| 順番 | ファイル | 内容 |
+|------|---------|------|
+| 10 | `create_knowhow_posts.sql` | case_posts の RLS 設定 |
+
+### 5️⃣ サンプルデータ（オプション）
+| 順番 | ファイル | 内容 |
+|------|---------|------|
+| 11 | `seed.sql` | デモユーザー |
+| 12 | `scenarios_seed.sql` | 学習シナリオ |
+| 13 | `simulation_seed.sql` | シミュレーションデータ |
+| 14 | `events_seed.sql` | イベントデータ |
+| 15 | `posts_seed.sql` | 投稿データ |
 
 ---
 
 ## ❓ トラブルシューティング
 
+### Q: `relation "users" does not exist` エラーが出る
+A: **`setup.sql` を使ってください。** 個別ファイルの場合は `schema.sql` を最初に実行してください。
+
 ### Q: テーブルがすでに存在するエラーが出る
-A: そのスキーマファイルはスキップして次に進んでください
+A: `setup.sql` は `IF NOT EXISTS` 付きなので安全に再実行できます。個別ファイルの場合はスキップして次に進んでください。
 
 ### Q: 外部キー制約エラーが出る
-A: 参照先のテーブルを先に作成してください（実行順序を確認）
-
-### Q: カラムがすでに存在するエラーが出る
-A: `IF NOT EXISTS` が付いている場合は問題ありません（スキップされます）
+A: ファイルの実行順序を確認してください。親テーブルを先に作成する必要があります。
