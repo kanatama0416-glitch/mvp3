@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Pause, RotateCcw, ArrowRight, Mic, Send, Volume2, ThumbsUp, AlertCircle, TrendingUp, X } from 'lucide-react';
+import { AIService } from '../../utils/aiService';
 
 interface SimulationSessionProps {
   scenario: {
@@ -55,6 +56,7 @@ export default function SimulationSession({ scenario, mode, onExit }: Simulation
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [recentFeedback, setRecentFeedback] = useState<Feedback | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,8 +66,8 @@ export default function SimulationSession({ scenario, mode, onExit }: Simulation
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputText.trim() || isLoading) return;
 
     // ユーザーのメッセージを追加
     const userMessage: Message = {
@@ -94,32 +96,44 @@ export default function SimulationSession({ scenario, mode, onExit }: Simulation
       setCurrentScore(Math.max(0, currentScore - 2));
     }
 
-    setMessages([...messages, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputText('');
+    setIsLoading(true);
 
-    // AIの返答（デモ用）
-    setTimeout(() => {
-      const aiResponses = [
-        'そうですか。詳しく教えていただけますか？',
-        'ありがとうございます。それでは、この方法はいかがでしょうか？',
-        'なるほど、わかりました。',
-        'それは良いですね。他に何かございますか？',
-      ];
+    // AIの返答（OpenRouter経由でDeepSeek）
+    try {
+      // 会話履歴からコンテキストを構築（初期メッセージと今回のユーザーメッセージを除く）
+      const context = updatedMessages
+        .slice(0, -1)
+        .filter(m => m.id !== '1')
+        .map(m => m.content);
+
+      const aiResponseText = await AIService.generateResponse(
+        inputText,
+        mode,
+        scenario.title,
+        context
+      );
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+        content: aiResponseText,
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, aiMessage]);
 
       // ステップを進める
-      if (messages.length >= 8) {
+      if (updatedMessages.length >= 8) {
         setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1));
       }
-    }, 1000);
+    } catch (error) {
+      console.error('AI response error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleComplete = () => {
