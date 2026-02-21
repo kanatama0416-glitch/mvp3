@@ -103,8 +103,9 @@ export default function SimulationSession({ scenario, mode, onExit }: Simulation
 
     // AIの返答（OpenRouter経由でDeepSeek）
     try {
-      // 会話履歴からコンテキストを構築（初期メッセージを除く）
+      // 会話履歴からコンテキストを構築（初期メッセージと今回のユーザーメッセージを除く）
       const context = updatedMessages
+        .slice(0, -1)
         .filter(m => m.id !== '1')
         .map(m => m.content);
 

@@ -34,7 +34,7 @@ export class AIService {
           'X-Title': 'AI Sales Skill Teacher',
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-chat-v3-0324',
+          model: 'deepseek/deepseek-chat-v3-0324:free',
           messages,
           max_tokens: 200,
           temperature: 0.8,
