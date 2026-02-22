@@ -201,6 +201,41 @@ ALTER TABLE community_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_reactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE growth_records ENABLE ROW LEVEL SECURITY;
 
+-- community_posts RLSポリシー（SELECT/INSERT を全ユーザーに許可）
+DROP POLICY IF EXISTS "community_posts_select_all" ON community_posts;
+CREATE POLICY "community_posts_select_all" ON community_posts
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "community_posts_insert_all" ON community_posts;
+CREATE POLICY "community_posts_insert_all" ON community_posts
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "community_posts_update_all" ON community_posts;
+CREATE POLICY "community_posts_update_all" ON community_posts
+  FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "community_posts_delete_all" ON community_posts;
+CREATE POLICY "community_posts_delete_all" ON community_posts
+  FOR DELETE USING (true);
+
+-- community_comments RLSポリシー
+DROP POLICY IF EXISTS "community_comments_select_all" ON community_comments;
+CREATE POLICY "community_comments_select_all" ON community_comments
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "community_comments_insert_all" ON community_comments;
+CREATE POLICY "community_comments_insert_all" ON community_comments
+  FOR INSERT WITH CHECK (true);
+
+-- post_reactions RLSポリシー
+DROP POLICY IF EXISTS "post_reactions_select_all" ON post_reactions;
+CREATE POLICY "post_reactions_select_all" ON post_reactions
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "post_reactions_insert_all" ON post_reactions;
+CREATE POLICY "post_reactions_insert_all" ON post_reactions
+  FOR INSERT WITH CHECK (true);
+
 
 -- ============================================================
 -- 2. シミュレーション機能（simulation_schema.sql）
