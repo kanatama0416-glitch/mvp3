@@ -1,21 +1,24 @@
 import { supabase } from '../lib/supabaseClient';
 import { CommunityPost } from '../types';
 
-type CasePostRow = {
+type CommunityPostRow = {
   id: string;
   author_id: string;
-  category: string;
   title: string;
-  related_event_id: string | null;
   situation: string;
-  approach: string; // maps to innovation
+  innovation: string;
   result: string;
-  notes: string; // maps to learning
+  learning: string;
   tags: string[];
+  visibility: string;
+  target_department: string | null;
+  target_theme: string | null;
   like_count: number;
   empathy_count: number;
   helpful_count: number;
-  is_ai_adopted: boolean | null;
+  views: number;
+  ai_summary: string | null;
+  is_approved_for_ai: boolean | null;
   created_at: string;
 };
 
@@ -27,19 +30,15 @@ type UserRow = {
 };
 
 export async function fetchOtherCasePosts(): Promise<CommunityPost[]> {
-  // 1) Fetch posts in 'other' category
+  // 1) Fetch posts from community_posts
   const { data: posts, error } = await supabase
-    .from('case_posts')
+    .from('community_posts')
     .select('*')
-    .eq('category', 'other')
     .order('created_at', { ascending: false })
-    .returns<CasePostRow[]>();
+    .returns<CommunityPostRow[]>();
 
   if (error) {
-    console.error('Failed to fetch case_posts (other):', error.message, 'code:', error.code, 'details:', error.details);
-    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
-      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
-    }
+    console.error('Failed to fetch community_posts:', error.message, 'code:', error.code, 'details:', error.details);
     throw new Error(error.message || 'fetchOtherCasePosts failed');
   }
 
@@ -60,7 +59,7 @@ export async function fetchOtherCasePosts(): Promise<CommunityPost[]> {
       .returns<UserRow[]>();
 
     if (usersError) {
-      console.error('Failed to fetch users for case_posts:', usersError.message);
+      console.error('Failed to fetch users for community_posts:', usersError.message);
     } else if (users) {
       for (const u of users) usersById.set(u.id, u);
     }
@@ -73,27 +72,27 @@ export async function fetchOtherCasePosts(): Promise<CommunityPost[]> {
       id: p.id,
       title: p.title,
       situation: p.situation,
-      innovation: p.approach,
+      innovation: p.innovation,
       result: p.result,
-      learning: p.notes,
+      learning: p.learning,
       tags: Array.isArray(p.tags) ? p.tags : [],
       author: {
         name: u?.name || '不明なユーザー',
         department: u?.department || '不明な部署',
         avatar: u?.avatar || 'https://placehold.co/80x80'
       },
-      visibility: 'public',
-      eventId: p.related_event_id || undefined,
+      visibility: (p.visibility as 'public' | 'department' | 'theme') || 'public',
+      eventId: undefined,
       reactions: {
         like: p.like_count ?? 0,
         empathy: p.empathy_count ?? 0,
         helpful: p.helpful_count ?? 0
       },
       comments: [],
-      views: 0,
+      views: p.views ?? 0,
       createdAt: new Date(p.created_at),
-      aiSummary: undefined,
-      isApprovedForAI: Boolean(p.is_ai_adopted)
+      aiSummary: p.ai_summary || undefined,
+      isApprovedForAI: Boolean(p.is_approved_for_ai)
     };
   });
 }
@@ -110,26 +109,21 @@ export async function createOtherCasePost(params: {
   const { authorId, title, situation, approach, result, notes, tags } = params;
   const payload = {
     author_id: authorId,
-    category: 'other',
     title,
-    related_event_id: null,
     situation,
-    approach,
+    innovation: approach,
     result,
-    notes,
+    learning: notes,
     tags,
-    // counts defaulted by DB
+    visibility: 'public',
   };
 
   const { error } = await supabase
-    .from('case_posts')
+    .from('community_posts')
     .insert([payload]);
 
   if (error) {
-    console.error('Failed to insert other case post:', error.message, 'code:', error.code, 'details:', error.details);
-    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
-      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
-    }
+    console.error('Failed to insert community post:', error.message, 'code:', error.code, 'details:', error.details);
     return false;
   }
   return true;
@@ -142,29 +136,24 @@ export async function fetchFavoriteEventPosts(params?: {
   const sinceIso = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000).toISOString();
 
   let { data: posts, error } = await supabase
-    .from('case_posts')
+    .from('community_posts')
     .select('*')
-    .eq('category', 'favorite_event')
     .gte('created_at', sinceIso)
     .order('created_at', { ascending: false })
-    .returns<CasePostRow[]>();
+    .returns<CommunityPostRow[]>();
 
   if (error) {
-    console.error('Failed to fetch favorite_event posts:', error.message, 'code:', error.code, 'details:', error.details);
-    if (error.code === '42P01' || error.message?.includes('404') || error.code === 'PGRST204') {
-      console.error('テーブル case_posts が存在しません。supabase/setup.sql を Supabase SQL Editor で実行してください。');
-    }
+    console.error('Failed to fetch community_posts:', error.message, 'code:', error.code, 'details:', error.details);
     throw new Error(error.message || 'fetchFavoriteEventPosts failed');
   }
 
   // fallback: if no posts in recent window, fetch without date filter
   if (!posts || posts.length === 0) {
     const res = await supabase
-      .from('case_posts')
+      .from('community_posts')
       .select('*')
-      .eq('category', 'favorite_event')
       .order('created_at', { ascending: false })
-      .returns<CasePostRow[]>();
+      .returns<CommunityPostRow[]>();
     if (!res.error) posts = res.data || [];
   }
 
@@ -185,27 +174,27 @@ export async function fetchFavoriteEventPosts(params?: {
       id: p.id,
       title: p.title,
       situation: p.situation,
-      innovation: p.approach,
+      innovation: p.innovation,
       result: p.result,
-      learning: p.notes,
+      learning: p.learning,
       tags: Array.isArray(p.tags) ? p.tags : [],
       author: {
         name: u?.name || '不明なユーザー',
         department: u?.department || '不明な部署',
         avatar: u?.avatar || 'https://placehold.co/80x80'
       },
-      visibility: 'public',
-      eventId: p.related_event_id || undefined,
+      visibility: (p.visibility as 'public' | 'department' | 'theme') || 'public',
+      eventId: undefined,
       reactions: {
         like: p.like_count ?? 0,
         empathy: p.empathy_count ?? 0,
         helpful: p.helpful_count ?? 0
       },
       comments: [],
-      views: 0,
+      views: p.views ?? 0,
       createdAt: new Date(p.created_at),
-      aiSummary: undefined,
-      isApprovedForAI: Boolean(p.is_ai_adopted)
+      aiSummary: p.ai_summary || undefined,
+      isApprovedForAI: Boolean(p.is_approved_for_ai)
     };
   });
 }
