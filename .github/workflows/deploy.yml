@@ -42,17 +42,17 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
 
-      - name: List dist
-        run: ls -la dist
+      - name: List docs
+        run: ls -la docs
 
-      # ✅ これがあると「distにindex.htmlが無い」を即発見できる
+      # ✅ これがあると「docsにindex.htmlが無い」を即発見できる
       - name: Check built index.html
-        run: test -f dist/index.html && echo "✅ dist/index.html exists" || (echo "❌ dist/index.html NOT found" && exit 1)
+        run: test -f docs/index.html && echo "✅ docs/index.html exists" || (echo "❌ docs/index.html NOT found" && exit 1)
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: -ai-sales-app-main/dist
+          path: -ai-sales-app-main/docs
 
   deploy:
     needs: build
