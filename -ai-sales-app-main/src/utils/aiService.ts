@@ -1,3 +1,5 @@
+import { buildCaseKnowledgeText } from '../data/caseKnowledge';
+
 export class AIService {
   static async generateResponse(
     message: string, 
@@ -40,7 +42,7 @@ export class AIService {
         body: JSON.stringify({
           model: 'deepseek/deepseek-chat',
           messages,
-          max_tokens: 200,
+          max_tokens: mode === 'consultation' ? 500 : 200,
           temperature: 0.8,
           top_p: 0.9,
         }),
@@ -64,8 +66,9 @@ export class AIService {
       cleanResponse = cleanResponse.replace(/^["'`]|["'`]$/g, '');
       cleanResponse = cleanResponse.replace(/^\*\*|\*\*$/g, '');
 
-      if (cleanResponse.length > 300) {
-        cleanResponse = cleanResponse.substring(0, 300) + '...';
+      const maxLength = mode === 'consultation' ? 800 : 300;
+      if (cleanResponse.length > maxLength) {
+        cleanResponse = cleanResponse.substring(0, maxLength) + '...';
       }
 
       return cleanResponse;
@@ -80,15 +83,23 @@ export class AIService {
 
   private static getSystemPrompt(mode: 'customer' | 'staff' | 'consultation', scenario: string): string {
     if (mode === 'consultation') {
+      const knowledge = buildCaseKnowledgeText();
       return `あなたは接客スキル向上のためのAI相談アシスタントです。
+以下の「事例集ナレッジ」を必ず参照し、具体的な事例・フレーズ・成功パターンを引用しながら回答してください。
 
 【あなたの役割】
 - ユーザーの接客やカード案内に関する悩みや質問に答える
-- 具体的なフレーズや対応方法を提案する
+- 事例集のデータを活用し、具体的なフレーズや対応方法を提案する
+- 該当するイベントや成功事例がある場合は、積極的に紹介する
+- Hook / Pitch / Card / Memo の構造に沿ったアドバイスを行う
 - 短く分かりやすく、実践的なアドバイスをする
-- 1-3文程度の自然な長さで応答する
 
-重要：常にプロフェッショナルで親しみやすい口調で応答してください。`;
+重要：常にプロフェッショナルで親しみやすい口調で応答してください。
+重要：回答は事例集の実データに基づいてください。知らないことは推測せず「事例集にはその情報がありません」と正直に伝えてください。
+
+===== 事例集ナレッジ =====
+${knowledge}
+===== ナレッジここまで =====`;
     }
 
     if (mode === 'staff') {
