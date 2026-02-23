@@ -64,11 +64,15 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
       return;
     }
     if (!formData.hook) {
-      alert('フック（Hook）を入力してください。');
+      alert('フックを入力してください。');
       return;
     }
     if (!formData.pitch) {
-      alert('引き込み（Pitch）を入力してください。');
+      alert('引き込みを入力してください。');
+      return;
+    }
+    if (!formData.card) {
+      alert('カード説明を入力してください。');
       return;
     }
     onSubmit(formData);
@@ -187,7 +191,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
 
           <div>
             <label htmlFor="hook" className="block text-sm font-medium text-gray-700 mb-2">
-              フック / Hook <span className="text-vivid-red">*</span>
+              フック <span className="text-vivid-red">*</span>
               <span className="ml-1 text-xs text-gray-400 font-normal">どう話しかけたか</span>
             </label>
             <textarea
@@ -202,7 +206,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
 
           <div>
             <label htmlFor="pitch" className="block text-sm font-medium text-gray-700 mb-2">
-              引き込み / Pitch <span className="text-vivid-red">*</span>
+              引き込み <span className="text-vivid-red">*</span>
               <span className="ml-1 text-xs text-gray-400 font-normal">どう関心を引いたか</span>
             </label>
             <textarea
@@ -217,7 +221,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
 
           <div>
             <label htmlFor="card" className="block text-sm font-medium text-gray-700 mb-2">
-              カード説明 / Card
+              カード説明 <span className="text-vivid-red">*</span>
               <span className="ml-1 text-xs text-gray-400 font-normal">どう説明したか</span>
             </label>
             <textarea
@@ -232,7 +236,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
 
           <div>
             <label htmlFor="memo" className="block text-sm font-medium text-gray-700 mb-2">
-              補足メモ / Memo
+              補足メモ
               <span className="ml-1 text-xs text-gray-400 font-normal">客層・気づきなど</span>
             </label>
             <textarea
