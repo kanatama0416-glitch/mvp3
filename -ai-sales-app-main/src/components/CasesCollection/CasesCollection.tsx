@@ -39,6 +39,7 @@ export default function CasesCollection({
       const success = await createOtherCasePost({
         authorId: user.id,
         title: data.title,
+        eventName: data.eventName || undefined,
         situation: data.situation,
         approach: data.approach,
         result: data.result || '',
