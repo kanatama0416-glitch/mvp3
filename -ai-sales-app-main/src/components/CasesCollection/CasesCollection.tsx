@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, BookOpen, ChevronRight, Calendar } from 'lucide-react';
+import { Plus, BookOpen, ChevronRight } from 'lucide-react';
 import Events from '../Events/Events';
 import PostModal, { PostFormData } from './PostModal';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
 import { useAuth } from '../../hooks/useAuth';
-import { createOtherCasePost, fetchRawCasePosts, RawCasePost } from '../../services/casePostService';
+import { createOtherCasePost, RawCasePost } from '../../services/casePostService';
 
 interface CasesCollectionProps {
   initialShowHookHelp?: boolean;
@@ -18,7 +18,6 @@ export default function CasesCollection({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [posts, setPosts] = useState<RawCasePost[]>([]);
   const [selectedPost, setSelectedPost] = useState<RawCasePost | null>(null);
   const { user } = useAuth();
 
@@ -30,10 +29,6 @@ export default function CasesCollection({
     }, 2000);
     return () => clearTimeout(timer);
   }, [initialShowHookHelp, onInitialHookHelpHandled]);
-
-  useEffect(() => {
-    fetchRawCasePosts().then(setPosts).catch(() => setPosts([]));
-  }, [refreshKey]);
 
   const handleSubmitPost = async (data: PostFormData) => {
     try {
@@ -63,7 +58,7 @@ export default function CasesCollection({
     }
   };
 
-  // ---- 投稿詳細モーダル ----
+  // ---- 投稿詳細ビュー ----
   if (selectedPost) {
     return (
       <div className="space-y-6 w-full max-w-full overflow-x-hidden">
@@ -145,68 +140,11 @@ export default function CasesCollection({
         </button>
       </div>
 
-      {/* 静的イベントカード（変更なし） */}
-      <div>
-        <Events refreshKey={refreshKey} />
-      </div>
-
-      {/* DB投稿カード（イベントカードと同スタイル） */}
-      {posts.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-gray-800 px-1">みんなの投稿</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {posts.map((post) => (
-              <div
-                key={post.id}
-                onClick={() => setSelectedPost(post)}
-                className="bg-white rounded-2xl border-2 border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-vivid-red">
-                        投稿
-                      </span>
-                      {post.event_title && (
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-blue border border-sky-100 truncate max-w-[140px]">
-                          {post.event_title}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-sky-blue transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{post.situation}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 mt-1 text-gray-400 group-hover:text-sky-blue transition-colors shrink-0" />
-                </div>
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    {post.tags.slice(0, 3).map((tag, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg">
-                        {tag}
-                      </span>
-                    ))}
-                    {post.tags.length > 3 && (
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-medium rounded-lg">
-                        +{post.tags.length - 3}件
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-1.5 text-sm text-gray-500 pt-3 border-t border-gray-100">
-                  <Calendar className="w-4 h-4 shrink-0" />
-                  <span>
-                    {new Date(post.created_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}投稿
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* イベントカード + DB投稿カードが同じグリッドで表示される */}
+      <Events
+        refreshKey={refreshKey}
+        onPostClick={(post) => setSelectedPost(post)}
+      />
 
       <PostModal
         isOpen={isModalOpen}
