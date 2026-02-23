@@ -550,20 +550,18 @@ AI要約: 体験型の魅力訴求が効果的です。
 学び: クレーム対応では信頼回復が最優先。その後の付加価値提案が効果的
 `.trim();function vy(){return[py,gy,xy,yy].join(`
 
-`)}class Xo{static async generateResponse(e,s,r,i=[]){var a,l,o;try{const c="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",d=this.getSystemPrompt(s,r);console.log("[AI Debug] mode:",s),console.log("[AI Debug] API Key exists:",!!c,"/ length:",c.length),console.log("[AI Debug] systemPrompt length:",d.length),console.log("[AI Debug] systemPrompt includes ナレッジ:",d.includes("事例集ナレッジ")),console.log("[AI Debug] systemPrompt first 200 chars:",d.substring(0,200)),console.log("[AI Debug] systemPrompt last 200 chars:",d.substring(d.length-200));const u=[{role:"system",content:d}],f=i.slice(-8);for(let x=0;x<f.length;x++)u.push({role:x%2===0?"user":"assistant",content:f[x]});u.push({role:"user",content:e});const h=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${c}`,"Content-Type":"application/json","HTTP-Referer":window.location.origin,"X-Title":"AI Sales Skill Teacher"},body:JSON.stringify({model:"deepseek/deepseek-chat",messages:u,max_tokens:s==="consultation"?500:200,temperature:.8,top_p:.9})});if(!h.ok){const x=await h.text();throw console.error(`OpenRouter API error: ${h.status} - ${x}`),new Error(`API error: ${h.status}`)}const b=await h.json(),y=(o=(l=(a=b.choices)==null?void 0:a[0])==null?void 0:l.message)==null?void 0:o.content;if(console.log("[AI Debug] API response status:",h.status),console.log("[AI Debug] AI raw response length:",(y==null?void 0:y.length)||0),console.log("[AI Debug] AI raw response:",y==null?void 0:y.substring(0,300)),!y)throw console.error("No content in API response:",b),new Error("No response content from AI");let v=y.trim();v=v.replace(/^["'`]|["'`]$/g,""),v=v.replace(/^\*\*|\*\*$/g,"");const k=s==="consultation"?800:300;return v.length>k&&(v=v.substring(0,k)+"..."),v}catch(c){return console.error("[AI Debug] CAUGHT ERROR - using fallback response"),console.error("AI Service Request Failed:",c),c instanceof Error&&console.error("Error details:",c.message),this.getFallbackResponse(s)}}static getSystemPrompt(e,s){return e==="consultation"?`あなたは接客スキル向上のためのAI相談アシスタントです。
-以下の「事例集ナレッジ」を必ず参照し、具体的な事例・フレーズ・成功パターンを引用しながら回答してください。
+`)}class Xo{static async generateResponse(e,s,r,i=[]){var a,l,o;try{const c="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",d=this.getSystemPrompt(s,r);console.log("[AI Debug] mode:",s),console.log("[AI Debug] API Key exists:",!!c,"/ length:",c.length),console.log("[AI Debug] systemPrompt length:",d.length),console.log("[AI Debug] systemPrompt includes ナレッジ:",d.includes("事例集ナレッジ")),console.log("[AI Debug] systemPrompt first 200 chars:",d.substring(0,200)),console.log("[AI Debug] systemPrompt last 200 chars:",d.substring(d.length-200));const u=[{role:"system",content:d}],f=i.slice(-8);for(let x=0;x<f.length;x++)u.push({role:x%2===0?"user":"assistant",content:f[x]});u.push({role:"user",content:e});const h=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${c}`,"Content-Type":"application/json","HTTP-Referer":window.location.origin,"X-Title":"AI Sales Skill Teacher"},body:JSON.stringify({model:"deepseek/deepseek-chat",messages:u,max_tokens:s==="consultation"?250:200,temperature:.8,top_p:.9})});if(!h.ok){const x=await h.text();throw console.error(`OpenRouter API error: ${h.status} - ${x}`),new Error(`API error: ${h.status}`)}const b=await h.json(),y=(o=(l=(a=b.choices)==null?void 0:a[0])==null?void 0:l.message)==null?void 0:o.content;if(console.log("[AI Debug] API response status:",h.status),console.log("[AI Debug] AI raw response length:",(y==null?void 0:y.length)||0),console.log("[AI Debug] AI raw response:",y==null?void 0:y.substring(0,300)),!y)throw console.error("No content in API response:",b),new Error("No response content from AI");let v=y.trim();v=v.replace(/^["'`]|["'`]$/g,""),v=v.replace(/^\*\*|\*\*$/g,"");const k=s==="consultation"?400:300;return v.length>k&&(v=v.substring(0,k)+"..."),v}catch(c){return console.error("[AI Debug] CAUGHT ERROR - using fallback response"),console.error("AI Service Request Failed:",c),c instanceof Error&&console.error("Error details:",c.message),this.getFallbackResponse(s)}}static getSystemPrompt(e,s){return e==="consultation"?`あなたは接客スキル向上のための練習パートナーAIです。
+ユーザーと対話しながら、接客やカード案内のスキルを一緒に磨いていきます。
 
-【あなたの役割】
-- ユーザーの接客やカード案内に関する悩みや質問に答える
-- 事例集のデータを活用し、具体的なフレーズや対応方法を提案する
-- 該当するイベントや成功事例がある場合は、積極的に紹介する
-- Hook / Pitch / Card / Memo の構造に沿ったアドバイスを行う
-- 短く分かりやすく、実践的なアドバイスをする
+【応答ルール】
+- 1〜3文の短い返答をする。長文は禁止
+- 一度に全部教えず、会話のキャッチボールを大事にする
+- ユーザーの発言に対してまずリアクションし、次に1つだけヒントや問いかけを返す
+- 事例集に関連する内容があれば、さりげなく引用する（丸ごとコピペはしない）
+- 「こういう場面ではどう声かけしますか？」のように、ユーザーに考えさせる問いかけを積極的に使う
+- 親しみやすく、プロフェッショナルな口調で話す
 
-重要：常にプロフェッショナルで親しみやすい口調で応答してください。
-重要：回答は事例集の実データに基づいてください。知らないことは推測せず「事例集にはその情報がありません」と正直に伝えてください。
-
-===== 事例集ナレッジ =====
+===== 事例集ナレッジ（参照用） =====
 ${vy()}
 ===== ナレッジここまで =====`:e==="staff"?`あなたは接客シミュレーションのお客様役です。シナリオ「${s}」に基づいて、お客様として自然に反応してください。
 

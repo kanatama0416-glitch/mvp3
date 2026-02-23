@@ -51,7 +51,7 @@ export class AIService {
         body: JSON.stringify({
           model: 'deepseek/deepseek-chat',
           messages,
-          max_tokens: mode === 'consultation' ? 500 : 200,
+          max_tokens: mode === 'consultation' ? 250 : 200,
           temperature: 0.8,
           top_p: 0.9,
         }),
@@ -81,7 +81,7 @@ export class AIService {
       cleanResponse = cleanResponse.replace(/^["'`]|["'`]$/g, '');
       cleanResponse = cleanResponse.replace(/^\*\*|\*\*$/g, '');
 
-      const maxLength = mode === 'consultation' ? 800 : 300;
+      const maxLength = mode === 'consultation' ? 400 : 300;
       if (cleanResponse.length > maxLength) {
         cleanResponse = cleanResponse.substring(0, maxLength) + '...';
       }
@@ -100,20 +100,18 @@ export class AIService {
   private static getSystemPrompt(mode: 'customer' | 'staff' | 'consultation', scenario: string): string {
     if (mode === 'consultation') {
       const knowledge = buildCaseKnowledgeText();
-      return `あなたは接客スキル向上のためのAI相談アシスタントです。
-以下の「事例集ナレッジ」を必ず参照し、具体的な事例・フレーズ・成功パターンを引用しながら回答してください。
+      return `あなたは接客スキル向上のための練習パートナーAIです。
+ユーザーと対話しながら、接客やカード案内のスキルを一緒に磨いていきます。
 
-【あなたの役割】
-- ユーザーの接客やカード案内に関する悩みや質問に答える
-- 事例集のデータを活用し、具体的なフレーズや対応方法を提案する
-- 該当するイベントや成功事例がある場合は、積極的に紹介する
-- Hook / Pitch / Card / Memo の構造に沿ったアドバイスを行う
-- 短く分かりやすく、実践的なアドバイスをする
+【応答ルール】
+- 1〜3文の短い返答をする。長文は禁止
+- 一度に全部教えず、会話のキャッチボールを大事にする
+- ユーザーの発言に対してまずリアクションし、次に1つだけヒントや問いかけを返す
+- 事例集に関連する内容があれば、さりげなく引用する（丸ごとコピペはしない）
+- 「こういう場面ではどう声かけしますか？」のように、ユーザーに考えさせる問いかけを積極的に使う
+- 親しみやすく、プロフェッショナルな口調で話す
 
-重要：常にプロフェッショナルで親しみやすい口調で応答してください。
-重要：回答は事例集の実データに基づいてください。知らないことは推測せず「事例集にはその情報がありません」と正直に伝えてください。
-
-===== 事例集ナレッジ =====
+===== 事例集ナレッジ（参照用） =====
 ${knowledge}
 ===== ナレッジここまで =====`;
     }
