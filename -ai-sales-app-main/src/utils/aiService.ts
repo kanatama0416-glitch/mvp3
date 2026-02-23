@@ -51,7 +51,7 @@ export class AIService {
         body: JSON.stringify({
           model: 'deepseek/deepseek-chat',
           messages,
-          max_tokens: mode === 'consultation' ? 250 : 200,
+          max_tokens: mode === 'consultation' ? 150 : 200,
           temperature: 0.8,
           top_p: 0.9,
         }),
@@ -81,7 +81,7 @@ export class AIService {
       cleanResponse = cleanResponse.replace(/^["'`]|["'`]$/g, '');
       cleanResponse = cleanResponse.replace(/^\*\*|\*\*$/g, '');
 
-      const maxLength = mode === 'consultation' ? 400 : 300;
+      const maxLength = mode === 'consultation' ? 100 : 300;
       if (cleanResponse.length > maxLength) {
         cleanResponse = cleanResponse.substring(0, maxLength) + '...';
       }
@@ -104,7 +104,7 @@ export class AIService {
 ユーザーと対話しながら、接客やカード案内のスキルを一緒に磨いていきます。
 
 【応答ルール】
-- 1〜3文の短い返答をする。長文は禁止
+- 1〜2文、100文字以内で返答する。それ以上は絶対に書かない
 - 一度に全部教えず、会話のキャッチボールを大事にする
 - ユーザーの発言に対してまずリアクションし、次に1つだけヒントや問いかけを返す
 - 事例集に関連する内容があれば、さりげなく引用する（丸ごとコピペはしない）
