@@ -17,6 +17,7 @@ export default function CasesCollection({
 }: CasesCollectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function CasesCollection({
       });
 
       if (success) {
+        setRefreshKey(k => k + 1);
         alert('投稿が完了しました！');
       } else {
         alert('投稿に失敗しました。もう一度お試しください。');
@@ -88,7 +90,7 @@ export default function CasesCollection({
       </div>
 
       <div>
-        <Events />
+        <Events refreshKey={refreshKey} />
       </div>
 
       <PostModal

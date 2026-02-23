@@ -302,7 +302,7 @@ export const EVENT_TITLE_OPTIONS = animeEvents.map((event) => event.name);
 
 type FilterStatus = 'all' | 'active' | 'completed' | 'upcoming' | 'my-events';
 
-export default function Events() {
+export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
   const { user, updateUser } = useAuth();
   const [viewMode, setViewMode] = useState<ViewModeWithCreate>('list');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -343,14 +343,10 @@ export default function Events() {
     return () => window.removeEventListener('message', handleHookHelpMessage);
   }, []);
 
-  // 選択イベントが変わったら DB 投稿を取得
+  // DB投稿を取得（イベント選択時・投稿後に即時反映）
   useEffect(() => {
-    if (!selectedEvent) {
-      setDbPosts([]);
-      return;
-    }
-    fetchRawCasePosts(selectedEvent.name).then(setDbPosts).catch(() => setDbPosts([]));
-  }, [selectedEvent]);
+    fetchRawCasePosts().then(setDbPosts).catch(() => setDbPosts([]));
+  }, [selectedEvent, refreshKey]);
 
   const filteredEvents = eventsSource.filter(event => {
     const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

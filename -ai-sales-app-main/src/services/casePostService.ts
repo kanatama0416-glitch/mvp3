@@ -148,18 +148,13 @@ export type RawCasePost = {
   created_at: string;
 };
 
-export async function fetchRawCasePosts(eventTitle?: string): Promise<RawCasePost[]> {
-  let query = supabase
+export async function fetchRawCasePosts(): Promise<RawCasePost[]> {
+  const { data, error } = await supabase
     .from('case_posts')
     .select('id,author_id,title,event_title,situation,approach,result,notes,tags,like_count,helpful_count,created_at')
     .eq('category', 'other')
     .order('created_at', { ascending: false });
 
-  if (eventTitle) {
-    query = query.eq('event_title', eventTitle);
-  }
-
-  const { data, error } = await query;
   if (error) {
     console.error('fetchRawCasePosts error:', error);
     return [];
