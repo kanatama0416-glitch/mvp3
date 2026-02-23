@@ -16,6 +16,15 @@ export class AIService {
 
       const systemPrompt = this.getSystemPrompt(mode, scenario);
 
+      // --- DEBUG START ---
+      console.log('[AI Debug] mode:', mode);
+      console.log('[AI Debug] API Key exists:', !!apiKey, '/ length:', apiKey.length);
+      console.log('[AI Debug] systemPrompt length:', systemPrompt.length);
+      console.log('[AI Debug] systemPrompt includes ナレッジ:', systemPrompt.includes('事例集ナレッジ'));
+      console.log('[AI Debug] systemPrompt first 200 chars:', systemPrompt.substring(0, 200));
+      console.log('[AI Debug] systemPrompt last 200 chars:', systemPrompt.substring(systemPrompt.length - 200));
+      // --- DEBUG END ---
+
       const messages: { role: string; content: string }[] = [
         { role: 'system', content: systemPrompt },
       ];
@@ -57,6 +66,12 @@ export class AIService {
       const data = await response.json();
       const aiResponseText = data.choices?.[0]?.message?.content;
 
+      // --- DEBUG START ---
+      console.log('[AI Debug] API response status:', response.status);
+      console.log('[AI Debug] AI raw response length:', aiResponseText?.length || 0);
+      console.log('[AI Debug] AI raw response:', aiResponseText?.substring(0, 300));
+      // --- DEBUG END ---
+
       if (!aiResponseText) {
         console.error('No content in API response:', data);
         throw new Error('No response content from AI');
@@ -73,6 +88,7 @@ export class AIService {
 
       return cleanResponse;
     } catch (error) {
+      console.error('[AI Debug] CAUGHT ERROR - using fallback response');
       console.error('AI Service Request Failed:', error);
       if (error instanceof Error) {
         console.error('Error details:', error.message);
