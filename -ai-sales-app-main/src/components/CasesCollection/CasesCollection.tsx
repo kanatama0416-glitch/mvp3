@@ -40,10 +40,10 @@ export default function CasesCollection({
         authorId: user.id,
         title: data.title,
         eventName: data.eventName || undefined,
-        situation: data.situation,
-        approach: data.approach,
-        result: data.result || '',
-        notes: data.learning || '',
+        hook: data.hook,
+        pitch: data.pitch,
+        card: data.card,
+        memo: data.memo,
         tags: data.tags,
       });
 

@@ -15,6 +15,7 @@ import EventPostForm from './EventPostForm';
 import { useAuth } from '../../hooks/useAuth';
 import { saveUserParticipatingEvents, getUserParticipatingEvents } from '../../services/eventService';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
+import { fetchRawCasePosts, RawCasePost } from '../../services/casePostService';
 
 interface Event {
   id: string;
@@ -317,6 +318,7 @@ export default function Events() {
   const [allEventsFilterArea, setAllEventsFilterArea] = useState<string>('all');
   const [allEventsFilterYear, setAllEventsFilterYear] = useState<string>('all');
   const [expandedStoresEventId, setExpandedStoresEventId] = useState<string | null>(null);
+  const [dbPosts, setDbPosts] = useState<RawCasePost[]>([]);
   const eventsSource = animeEvents;
 
   // ユーザーの参加イベントを取得
@@ -340,6 +342,15 @@ export default function Events() {
     window.addEventListener('message', handleHookHelpMessage);
     return () => window.removeEventListener('message', handleHookHelpMessage);
   }, []);
+
+  // 選択イベントが変わったら DB 投稿を取得
+  useEffect(() => {
+    if (!selectedEvent) {
+      setDbPosts([]);
+      return;
+    }
+    fetchRawCasePosts(selectedEvent.name).then(setDbPosts).catch(() => setDbPosts([]));
+  }, [selectedEvent]);
 
   const filteredEvents = eventsSource.filter(event => {
     const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -533,7 +544,22 @@ export default function Events() {
     };
 
     const primaryPost = selectedEvent.id === 'deco27' ? decoPost : buildPostFromEvent(selectedEvent);
-    const detailPosts: DetailPost[] = [];
+    const detailPosts: DetailPost[] = dbPosts.map((p, idx) => ({
+      id: idx + 10000,
+      staffName: '投稿者',
+      eventName: p.event_title || selectedEvent.name,
+      storeName: '',
+      tags: Array.isArray(p.tags) ? p.tags : [],
+      hookWords: [p.situation.slice(0, 60)],
+      pitchWords: [p.approach.slice(0, 60)],
+      cardWords: [(p.result || '').slice(0, 60)],
+      hookContent: p.situation,
+      pitchContent: p.approach,
+      cardContent: p.result || '',
+      memoContent: p.notes || '',
+      likes: p.like_count || 0,
+      helpful: p.helpful_count || 0,
+    }));
     const sortedPosts = [primaryPost, ...detailPosts].sort((a, b) => (b.likes || 0) - (a.likes || 0));
     const topPost = sortedPosts[0];
 

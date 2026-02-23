@@ -101,21 +101,21 @@ export async function createOtherCasePost(params: {
   authorId: string;
   title: string;
   eventName?: string;
-  situation: string;
-  approach: string;
-  result: string;
-  notes: string;
+  hook: string;
+  pitch: string;
+  card: string;
+  memo: string;
   tags: string[];
 }): Promise<boolean> {
-  const { authorId, title, eventName, situation, approach, result, notes, tags } = params;
+  const { authorId, title, eventName, hook, pitch, card, memo, tags } = params;
   const payload: Record<string, unknown> = {
     author_id: authorId,
     category: 'other',
     title,
-    situation,
-    approach,
-    result,
-    notes: notes || null,
+    situation: hook,
+    approach: pitch,
+    result: card,
+    notes: memo || null,
     tags,
   };
   if (eventName) {
@@ -131,6 +131,40 @@ export async function createOtherCasePost(params: {
     return false;
   }
   return true;
+}
+
+export type RawCasePost = {
+  id: string;
+  author_id: string;
+  title: string;
+  event_title: string | null;
+  situation: string;
+  approach: string;
+  result: string;
+  notes: string | null;
+  tags: string[];
+  like_count: number;
+  helpful_count: number;
+  created_at: string;
+};
+
+export async function fetchRawCasePosts(eventTitle?: string): Promise<RawCasePost[]> {
+  let query = supabase
+    .from('case_posts')
+    .select('id,author_id,title,event_title,situation,approach,result,notes,tags,like_count,helpful_count,created_at')
+    .eq('category', 'other')
+    .order('created_at', { ascending: false });
+
+  if (eventTitle) {
+    query = query.eq('event_title', eventTitle);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('fetchRawCasePosts error:', error);
+    return [];
+  }
+  return (data as RawCasePost[]) || [];
 }
 
 export async function fetchFavoriteEventPosts(params?: {

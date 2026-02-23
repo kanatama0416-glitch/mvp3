@@ -13,10 +13,10 @@ interface PostModalProps {
 export interface PostFormData {
   title: string;
   eventName: string;
-  situation: string;
-  approach: string;
-  result: string;
-  learning: string;
+  hook: string;
+  pitch: string;
+  card: string;
+  memo: string;
   tags: string[];
 }
 
@@ -28,10 +28,10 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
   const [formData, setFormData] = useState<PostFormData>({
     title: '',
     eventName: '',
-    situation: '',
-    approach: '',
-    result: '',
-    learning: '',
+    hook: '',
+    pitch: '',
+    card: '',
+    memo: '',
     tags: [],
   });
 
@@ -49,10 +49,10 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
     setFormData({
       title: '',
       eventName: '',
-      situation: '',
-      approach: '',
-      result: '',
-      learning: '',
+      hook: '',
+      pitch: '',
+      card: '',
+      memo: '',
       tags: [],
     });
   };
@@ -63,12 +63,12 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
       alert('タイトルを入力してください。');
       return;
     }
-    if (!formData.situation) {
-      alert('状況を入力してください。');
+    if (!formData.hook) {
+      alert('フック（Hook）を入力してください。');
       return;
     }
-    if (!formData.approach) {
-      alert('工夫・アプローチを入力してください。');
+    if (!formData.pitch) {
+      alert('引き込み（Pitch）を入力してください。');
       return;
     }
     onSubmit(formData);
@@ -186,58 +186,62 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
           </div>
 
           <div>
-            <label htmlFor="situation" className="block text-sm font-medium text-gray-700 mb-2">
-              状況 <span className="text-vivid-red">*</span>
+            <label htmlFor="hook" className="block text-sm font-medium text-gray-700 mb-2">
+              フック / Hook <span className="text-vivid-red">*</span>
+              <span className="ml-1 text-xs text-gray-400 font-normal">どう話しかけたか</span>
             </label>
             <textarea
-              id="situation"
-              value={formData.situation}
-              onChange={(e) => setFormData((prev) => ({ ...prev, situation: e.target.value }))}
+              id="hook"
+              value={formData.hook}
+              onChange={(e) => setFormData((prev) => ({ ...prev, hook: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="例: 20代男性、アニメイベントでグッズ購入、初回来店"
+              placeholder="例: 「今日3000円超えている方が多いので、抽選会に参加できますがエポスカードお持ちですか？」"
             />
           </div>
 
           <div>
-            <label htmlFor="approach" className="block text-sm font-medium text-gray-700 mb-2">
-              工夫・アプローチ <span className="text-vivid-red">*</span>
+            <label htmlFor="pitch" className="block text-sm font-medium text-gray-700 mb-2">
+              引き込み / Pitch <span className="text-vivid-red">*</span>
+              <span className="ml-1 text-xs text-gray-400 font-normal">どう関心を引いたか</span>
             </label>
             <textarea
-              id="approach"
-              value={formData.approach}
-              onChange={(e) => setFormData((prev) => ({ ...prev, approach: e.target.value }))}
+              id="pitch"
+              value={formData.pitch}
+              onChange={(e) => setFormData((prev) => ({ ...prev, pitch: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="例: お客様の好きなアニメ作品について会話を始め、関連商品でポイントが貯まることを具体例で説明"
+              placeholder="例: スマホ入会で3000円割引、抽選会B賞プレゼントと伝えて関心を引いた"
             />
           </div>
 
           <div>
-            <label htmlFor="result" className="block text-sm font-medium text-gray-700 mb-2">
-              結果
+            <label htmlFor="card" className="block text-sm font-medium text-gray-700 mb-2">
+              カード説明 / Card
+              <span className="ml-1 text-xs text-gray-400 font-normal">どう説明したか</span>
             </label>
             <textarea
-              id="result"
-              value={formData.result}
-              onChange={(e) => setFormData((prev) => ({ ...prev, result: e.target.value }))}
+              id="card"
+              value={formData.card}
+              onChange={(e) => setFormData((prev) => ({ ...prev, card: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="例: お客様が興味を示し、その場でカード申込み"
+              placeholder="例: 年会費無料・次回のイベントでもお得に使えると説明し、その場で申し込み"
             />
           </div>
 
           <div>
-            <label htmlFor="learning" className="block text-sm font-medium text-gray-700 mb-2">
-              学び
+            <label htmlFor="memo" className="block text-sm font-medium text-gray-700 mb-2">
+              補足メモ / Memo
+              <span className="ml-1 text-xs text-gray-400 font-normal">客層・気づきなど</span>
             </label>
             <textarea
-              id="learning"
-              value={formData.learning}
-              onChange={(e) => setFormData((prev) => ({ ...prev, learning: e.target.value }))}
+              id="memo"
+              value={formData.memo}
+              onChange={(e) => setFormData((prev) => ({ ...prev, memo: e.target.value }))}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="例: お客様の趣味に寄り添った具体例を示すことで、カードの価値を実感してもらえる"
+              placeholder="例: 20代男性・アニメ好き。キャラ名を覚えておくと話が弾む"
             />
           </div>
 
