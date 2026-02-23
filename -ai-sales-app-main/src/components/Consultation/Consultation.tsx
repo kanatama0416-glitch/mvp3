@@ -94,6 +94,7 @@ export default function Consultation() {
           <div>
             <p className="text-sm text-gray-500">AI相談アシスタント</p>
             <p className="font-semibold text-gray-900">リアルな接客の悩みを一緒に整理します</p>
+            <p className="text-xs text-green-600 font-medium mt-0.5">実際の事例をAIが学習しています</p>
           </div>
         </div>
 
