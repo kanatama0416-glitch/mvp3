@@ -778,7 +778,7 @@ ${e.conversationHistory.map((s,r)=>`${r%2===0?"お客様":"店員"}: ${s}`).join
         <div class="flex gap-3">
           <div class="shrink-0 w-8 h-8 rounded-full border border-blue-500/50 flex items-center justify-center text-[10px] font-bold text-blue-400 mt-1">3</div>
           <div class="bubble">
-            <p class="text-sm font-bold text-gray-800">「入会・年会費はずっと無料です。<br>5分で作れますが、お作りしましょうか？」</p>
+            <p class="text-sm font-bold text-gray-800">「入会・年会費はずっと無料です。<br>20分で作れますが、お作りしましょうか？」</p>
           </div>
         </div>
       </div>
