@@ -378,6 +378,7 @@ export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
     setViewMode('detail');
+    window.scrollTo(0, 0);
   };
 
   const handleBackToList = () => {
