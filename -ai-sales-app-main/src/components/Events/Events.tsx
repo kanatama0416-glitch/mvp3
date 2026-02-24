@@ -302,7 +302,7 @@ export const EVENT_TITLE_OPTIONS = animeEvents.map((event) => event.name);
 
 type FilterStatus = 'all' | 'active' | 'completed' | 'upcoming' | 'my-events';
 
-export default function Events({ refreshKey = 0, onPostClick }: { refreshKey?: number; onPostClick?: (post: RawCasePost) => void }) {
+export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
   const { user, updateUser } = useAuth();
   const [viewMode, setViewMode] = useState<ViewModeWithCreate>('list');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -540,7 +540,8 @@ export default function Events({ refreshKey = 0, onPostClick }: { refreshKey?: n
     };
 
     const primaryPost = selectedEvent.id === 'deco27' ? decoPost : buildPostFromEvent(selectedEvent);
-    const detailPosts: DetailPost[] = dbPosts.map((p, idx) => ({
+    const eventDbPosts = dbPosts.filter(p => p.event_title === selectedEvent.name);
+    const detailPosts: DetailPost[] = eventDbPosts.map((p, idx) => ({
       id: idx + 10000,
       staffName: '投稿者',
       eventName: p.event_title || selectedEvent.name,
@@ -933,50 +934,6 @@ export default function Events({ refreshKey = 0, onPostClick }: { refreshKey?: n
                 </div>
               </div>
             )}
-          </div>
-        ))}
-        {dbPosts.map((post) => (
-          <div
-            key={`post-${post.id}`}
-            onClick={() => onPostClick?.(post)}
-            className="bg-white rounded-2xl border-2 border-gray-300 p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-          >
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-vivid-red">
-                    投稿
-                  </span>
-                  {post.event_title && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-blue border border-sky-100">
-                      {post.event_title}
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-sky-blue transition-colors">
-                  {post.title}
-                </h3>
-              </div>
-              <ChevronRight className="w-5 h-5 mt-1 text-gray-400 group-hover:text-sky-blue transition-colors shrink-0" />
-            </div>
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {(post.tags || []).slice(0, 3).map((tag, index) => (
-                <span key={index} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg">
-                  {tag}
-                </span>
-              ))}
-              {post.tags && post.tags.length > 3 && (
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-medium rounded-lg">
-                  +{post.tags.length - 3}件
-                </span>
-              )}
-            </div>
-            <div className="flex items-center text-sm text-gray-500 pt-3 border-t border-gray-100">
-              <Calendar className="w-4 h-4 shrink-0 mr-1.5" />
-              <span>
-                {new Date(post.created_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}投稿
-              </span>
-            </div>
           </div>
         ))}
       </div>

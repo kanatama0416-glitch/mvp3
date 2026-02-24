@@ -1,5 +1,5 @@
-﻿import React, { useMemo, useState } from 'react';
-import { BookOpen, Search, X } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { BookOpen, X } from 'lucide-react';
 import { EVENT_TITLE_OPTIONS } from '../Events/Events';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
 import { suggestedTags } from '../../data/mockData';
@@ -21,8 +21,6 @@ export interface PostFormData {
 }
 
 export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps) {
-  const [searchText, setSearchText] = useState('');
-  const [showEventList, setShowEventList] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [formData, setFormData] = useState<PostFormData>({
@@ -35,15 +33,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
     tags: [],
   });
 
-  const filteredEvents = useMemo(() => {
-    const query = searchText.trim().toLowerCase();
-    if (!query) return EVENT_TITLE_OPTIONS;
-    return EVENT_TITLE_OPTIONS.filter((eventName) => eventName.toLowerCase().includes(query));
-  }, [searchText]);
-
   const resetForm = () => {
-    setSearchText('');
-    setShowEventList(false);
     setShowHookHelp(false);
     setTagInput('');
     setFormData({
@@ -59,8 +49,8 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title) {
-      alert('タイトルを入力してください。');
+    if (!formData.eventName) {
+      alert('イベントを選択してください。');
       return;
     }
     if (!formData.hook) {
@@ -75,7 +65,7 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
       alert('カード説明を入力してください。');
       return;
     }
-    onSubmit(formData);
+    onSubmit({ ...formData, title: formData.eventName });
     onClose();
     resetForm();
   };
@@ -83,12 +73,6 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
   const handleClose = () => {
     onClose();
     resetForm();
-  };
-
-  const handleSelectEvent = (eventName: string) => {
-    setFormData((prev) => ({ ...prev, eventName: eventName }));
-    setSearchText(eventName);
-    setShowEventList(false);
   };
 
   const handleAddTag = (tag: string) => {
@@ -129,64 +113,20 @@ export default function PostModal({ isOpen, onClose, onSubmit }: PostModalProps)
           </button>
 
           <div>
-            <label htmlFor="postTitle" className="block text-sm font-medium text-gray-700 mb-2">
-              タイトル <span className="text-vivid-red">*</span>
+            <label htmlFor="eventSelect" className="block text-sm font-medium text-gray-700 mb-2">
+              イベント <span className="text-vivid-red">*</span>
             </label>
-            <input
-              id="postTitle"
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-              placeholder="例: アニメファンのお客様への効果的なカード口コミ"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="titleSearch" className="block text-sm font-medium text-gray-700 mb-2">
-              関連イベント（任意）
-            </label>
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                id="titleSearch"
-                type="text"
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setShowEventList(true);
-                  if (e.target.value !== formData.eventName) {
-                    setFormData((prev) => ({ ...prev, eventName: '' }));
-                  }
-                }}
-                onFocus={() => setShowEventList(true)}
-                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent"
-                placeholder="イベントを検索して選択"
-              />
-            </div>
-
-            {showEventList && (
-              <div className="mt-2 border border-gray-200 rounded-lg bg-white max-h-48 overflow-y-auto">
-                {filteredEvents.length > 0 ? (
-                  filteredEvents.map((eventName) => (
-                    <button
-                      key={eventName}
-                      type="button"
-                      onClick={() => handleSelectEvent(eventName)}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      {eventName}
-                    </button>
-                  ))
-                ) : (
-                  <p className="px-3 py-2 text-sm text-gray-500">該当するイベントがありません</p>
-                )}
-              </div>
-            )}
-
-            {formData.eventName && (
-              <p className="mt-2 text-xs text-gray-600">選択中: {formData.eventName}</p>
-            )}
+            <select
+              id="eventSelect"
+              value={formData.eventName}
+              onChange={(e) => setFormData((prev) => ({ ...prev, eventName: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-blue focus:border-transparent bg-white"
+            >
+              <option value="">イベントを選択してください</option>
+              {EVENT_TITLE_OPTIONS.map((eventName) => (
+                <option key={eventName} value={eventName}>{eventName}</option>
+              ))}
+            </select>
           </div>
 
           <div>

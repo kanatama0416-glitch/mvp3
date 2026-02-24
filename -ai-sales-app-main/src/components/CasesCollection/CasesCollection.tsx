@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, BookOpen, ChevronRight } from 'lucide-react';
+import { Plus, BookOpen } from 'lucide-react';
 import Events from '../Events/Events';
 import PostModal, { PostFormData } from './PostModal';
 import { HOOK_HELP_HTML } from '../shared/hookHelpHtml';
 import { useAuth } from '../../hooks/useAuth';
-import { createOtherCasePost, RawCasePost } from '../../services/casePostService';
+import { createOtherCasePost } from '../../services/casePostService';
 
 interface CasesCollectionProps {
   initialShowHookHelp?: boolean;
@@ -18,7 +18,6 @@ export default function CasesCollection({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showHookHelp, setShowHookHelp] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selectedPost, setSelectedPost] = useState<RawCasePost | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -38,8 +37,8 @@ export default function CasesCollection({
       }
       const success = await createOtherCasePost({
         authorId: user.id,
-        title: data.title,
-        eventName: data.eventName || undefined,
+        title: data.eventName,
+        eventName: data.eventName,
         hook: data.hook,
         pitch: data.pitch,
         card: data.card,
@@ -58,63 +57,6 @@ export default function CasesCollection({
     }
   };
 
-  // ---- 投稿詳細ビュー ----
-  if (selectedPost) {
-    return (
-      <div className="space-y-6 w-full max-w-full overflow-x-hidden">
-        <button
-          onClick={() => setSelectedPost(null)}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors"
-        >
-          <ChevronRight className="w-4 h-4 rotate-180" />
-          戻る
-        </button>
-
-        <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm space-y-5">
-          {selectedPost.event_title && (
-            <span className="inline-block text-[9px] font-black text-white bg-blue-600 px-2 py-0.5 rounded uppercase tracking-widest">
-              {selectedPost.event_title}
-            </span>
-          )}
-          <h2 className="text-xl font-bold text-gray-900">{selectedPost.title}</h2>
-
-          <div className="bg-orange-50/50 p-5 rounded-3xl border border-orange-100/70">
-            <p className="font-bold text-orange-500 text-[10px] uppercase mb-2 tracking-widest">Hook / フック</p>
-            <p className="whitespace-pre-wrap text-gray-700 text-[13px] leading-relaxed">{selectedPost.situation}</p>
-          </div>
-
-          <div className="bg-green-50/50 p-5 rounded-3xl border border-green-100/70">
-            <p className="font-bold text-green-600 text-[10px] uppercase mb-2 tracking-widest">Pitch / 引き込み</p>
-            <p className="whitespace-pre-wrap text-gray-700 text-[13px] leading-relaxed">{selectedPost.approach}</p>
-          </div>
-
-          {selectedPost.result && (
-            <div className="bg-blue-50/50 p-5 rounded-3xl border border-blue-100/70">
-              <p className="font-bold text-blue-600 text-[10px] uppercase mb-2 tracking-widest">Card / カード説明</p>
-              <p className="whitespace-pre-wrap text-gray-700 text-[13px] leading-relaxed">{selectedPost.result}</p>
-            </div>
-          )}
-
-          {selectedPost.notes && (
-            <div className="bg-gray-100/60 p-5 rounded-3xl border border-gray-200/70">
-              <p className="font-bold text-gray-500 text-[10px] uppercase mb-2 tracking-widest">Memo / 補足メモ</p>
-              <p className="whitespace-pre-wrap text-gray-700 text-[13px] leading-relaxed">{selectedPost.notes}</p>
-            </div>
-          )}
-
-          {selectedPost.tags && selectedPost.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-2">
-              {selectedPost.tags.map((tag, i) => (
-                <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg">{tag}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ---- メインビュー ----
   return (
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="text-center">
@@ -140,11 +82,7 @@ export default function CasesCollection({
         </button>
       </div>
 
-      {/* イベントカード + DB投稿カードが同じグリッドで表示される */}
-      <Events
-        refreshKey={refreshKey}
-        onPostClick={(post) => setSelectedPost(post)}
-      />
+      <Events refreshKey={refreshKey} />
 
       <PostModal
         isOpen={isModalOpen}
