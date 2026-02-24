@@ -77,7 +77,6 @@ export default function CasesCollection({
           onClick={() => setIsModalOpen(true)}
           className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <Plus className="w-3.5 h-3.5" />
           ＋投稿（本来は達人にのみ表示されます）
         </button>
       </div>
