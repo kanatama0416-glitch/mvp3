@@ -72,7 +72,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       <div
         className={`w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-700 ${currentSlideData.bgColor} border-4 border-white`}
       >
-        <div className="relative min-h-[600px] flex flex-col">
+        <div className="relative min-h-[600px] flex flex-col" style={{ minHeight: '85vh' }}>
           <div className="absolute top-6 left-12 right-12 h-1.5 bg-black/5 rounded-full overflow-hidden">
             <div
               className="h-full bg-red-500 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(239,68,68,0.5)]"
@@ -189,10 +189,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
                   <ArrowDown className="text-orange-400 mx-auto" />
 
-                  <div className="bg-orange-500 p-4 rounded-2xl shadow-lg transform scale-105">
-                    <div className="text-white font-bold flex items-center justify-center gap-2">
-                      <ShieldCheck /> 実践で使えるノウハウに
-                    </div>
+                  <div className="flex items-center justify-center gap-2 text-orange-500 font-semibold text-sm">
+                    <ShieldCheck className="w-4 h-4" /> 実践で使えるノウハウに
                   </div>
                 </div>
               </div>
@@ -224,7 +222,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             )}
           </div>
 
-          <div className="px-12 py-10 flex items-center justify-between">
+          <div className="px-12 py-6 mt-auto flex items-center justify-between">
             <button
               onClick={prevSlide}
               className={`flex items-center gap-1 font-bold transition-all ${
