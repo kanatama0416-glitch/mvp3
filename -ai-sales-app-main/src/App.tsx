@@ -19,7 +19,12 @@ function App() {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showOnboarding, setShowOnboarding] = useState(true);
-  const [openCasesHookHelpOnLoad, setOpenCasesHookHelpOnLoad] = useState(false);
+  const [casesResetKey, setCasesResetKey] = useState(0);
+
+  const handleLogoClick = () => {
+    setActiveTab('cases');
+    setCasesResetKey(k => k + 1);
+  };
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
 
   if (isLoading) {
@@ -117,6 +122,7 @@ function App() {
       case 'cases':
         return (
           <CasesCollection
+            key={casesResetKey}
             initialShowHookHelp={openCasesHookHelpOnLoad}
             onInitialHookHelpHandled={() => setOpenCasesHookHelpOnLoad(false)}
           />
@@ -134,7 +140,7 @@ function App() {
         title={getTabTitle(activeTab)}
         onMenuToggle={() => {}}
         onProfileClick={() => setActiveTab('profile')}
-        onLogoClick={() => setActiveTab('cases')}
+        onLogoClick={handleLogoClick}
         onLogout={handleLogout}
         user={user}
       />
