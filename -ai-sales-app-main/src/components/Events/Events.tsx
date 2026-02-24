@@ -753,20 +753,6 @@ export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
           })}
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
-          <a
-            href="https://docs.google.com/forms/d/1ZVv_aefg2sSfXiKEzNXprRJEb0C0tQiUAH50M_l-RAs/edit?usp=forms_home&ouid=117951192700997366273&ths=true"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-600 text-white rounded-2xl py-4 font-semibold shadow-lg shadow-blue-200 text-center"
-          >
-            ＋投稿（本来は達人ユーザーのみに表示されます）
-          </a>
-        </div>
-
-        <div className="mt-3 px-1 space-y-1">
-        </div>
-
         {showHookHelp && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 py-6"
