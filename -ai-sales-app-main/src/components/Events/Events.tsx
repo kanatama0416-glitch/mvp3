@@ -752,28 +752,18 @@ export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
           })}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <a
             href="https://docs.google.com/forms/d/1ZVv_aefg2sSfXiKEzNXprRJEb0C0tQiUAH50M_l-RAs/edit?usp=forms_home&ouid=117951192700997366273&ths=true"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-blue-600 text-white rounded-2xl py-4 font-semibold shadow-lg shadow-blue-200 text-center"
           >
-            投稿
-          </a>
-          <a
-            href="https://docs.google.com/forms/d/1P8QJ34C5Mt6PQq82GSrHhbm3K8mQK-gSNp33HA9at9k/edit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white border border-gray-200 rounded-2xl py-4 font-bold text-gray-700 text-center"
-          >
-            アンケート
+            ＋投稿（本来は達人ユーザーのみに表示されます）
           </a>
         </div>
 
         <div className="mt-3 px-1 space-y-1">
-          <p className="text-[11px] text-gray-500">※運営中にお気づきの点があれば、「投稿」からぜひ共有してください（いつでもOK）</p>
-          <p className="text-[11px] text-gray-500">※ご利用後に「アンケート」へのご回答にご協力をお願いいたします</p>
         </div>
 
         {showHookHelp && (
