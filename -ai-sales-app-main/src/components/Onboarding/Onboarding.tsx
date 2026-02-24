@@ -189,8 +189,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
                   <ArrowDown className="text-orange-400 mx-auto" />
 
-                  <div className="flex items-center justify-center gap-2 text-orange-500 font-semibold text-sm">
-                    <ShieldCheck className="w-4 h-4" /> 実践で使えるノウハウに
+                  <div className="flex items-center justify-center gap-2 text-orange-500 font-bold text-lg">
+                    <ShieldCheck className="w-6 h-6" /> 実践で使えるノウハウに
                   </div>
                 </div>
               </div>
