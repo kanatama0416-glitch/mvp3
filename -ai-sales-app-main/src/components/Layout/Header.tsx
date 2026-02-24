@@ -6,6 +6,7 @@ interface HeaderProps {
   onMenuToggle: () => void;
   onProfileClick: () => void;
   onLogout: () => void;
+  onLogoClick?: () => void;
   user: {
     id: string;
     name: string;
@@ -16,7 +17,7 @@ interface HeaderProps {
   } | null;
 }
 
-export default function Header({ title, onMenuToggle, onProfileClick, onLogout, user }: HeaderProps) {
+export default function Header({ title, onMenuToggle, onProfileClick, onLogout, onLogoClick, user }: HeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -28,14 +29,17 @@ export default function Header({ title, onMenuToggle, onProfileClick, onLogout, 
             <Menu className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center space-x-2">
+          <button
+            onClick={onLogoClick}
+            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          >
             <img
               src={`${import.meta.env.BASE_URL}app-icon.png?v=3`}
               alt="まなびー アイコン"
               className="w-8 h-8 rounded-lg object-cover"
             />
             <h1 className="text-lg sm:text-xl font-semibold text-gray-900">まなびー</h1>
-          </div>
+          </button>
           <div className="hidden md:block w-px h-6 bg-gray-300" />
           <h2 className="hidden md:block text-base lg:text-lg text-gray-700">{title}</h2>
         </div>

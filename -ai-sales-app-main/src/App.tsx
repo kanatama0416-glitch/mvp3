@@ -134,6 +134,7 @@ function App() {
         title={getTabTitle(activeTab)}
         onMenuToggle={() => {}}
         onProfileClick={() => setActiveTab('profile')}
+        onLogoClick={() => setActiveTab('cases')}
         onLogout={handleLogout}
         user={user}
       />
