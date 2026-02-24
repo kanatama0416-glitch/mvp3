@@ -176,7 +176,6 @@ export default function Consultation() {
           </div>
           <div className="mt-3 text-xs text-gray-500 flex items-center justify-between">
             <span>入力内容はローカルでのみ表示されます</span>
-            <span className="text-success-green">ヒント: 具体的な場面を1文添える</span>
           </div>
         </div>
       </div>

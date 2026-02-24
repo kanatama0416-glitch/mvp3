@@ -64,20 +64,20 @@ export default function CasesCollection({
         <p className="text-gray-600 mt-1">イベントの好事例をまとめています</p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-3">
+      <div className="flex items-center justify-between">
         <button
           onClick={() => setShowHookHelp(true)}
-          className="inline-flex min-w-[220px] items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-sky-blue text-white font-bold shadow-lg shadow-sky-200 hover:bg-blue-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <BookOpen className="w-5 h-5" />
+          <BookOpen className="w-3.5 h-3.5" />
           口コミの構造
         </button>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex min-w-[220px] items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-vivid-red text-white font-bold shadow-lg shadow-red-200 hover:bg-red-600 transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-3.5 h-3.5" />
           投稿
         </button>
       </div>
