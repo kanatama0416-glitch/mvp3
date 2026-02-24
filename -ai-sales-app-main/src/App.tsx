@@ -20,11 +20,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [casesResetKey, setCasesResetKey] = useState(0);
-
-  const handleLogoClick = () => {
-    setActiveTab('cases');
-    setCasesResetKey(k => k + 1);
-  };
+  const [openCasesHookHelpOnLoad, setOpenCasesHookHelpOnLoad] = useState(false);
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
 
   if (isLoading) {
@@ -89,6 +85,11 @@ function App() {
     logout();
     setShowOnboarding(true);
     setActiveTab('dashboard');
+  };
+
+  const handleLogoClick = () => {
+    setActiveTab('cases');
+    setCasesResetKey(k => k + 1);
   };
 
   if (showOnboarding) {
