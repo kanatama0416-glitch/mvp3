@@ -762,6 +762,12 @@ export default function Events({ refreshKey = 0 }: { refreshKey?: number }) {
               className="relative w-full max-w-3xl h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
+              <button
+                onClick={() => setShowHookHelp(false)}
+                className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800"
+              >
+                閉じる
+              </button>
               <iframe
                 title="口コミの構造"
                 srcDoc={HOOK_HELP_HTML}
